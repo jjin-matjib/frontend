@@ -1,0 +1,44 @@
+name: Backmerge main to develop
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  backmerge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Merge main into develop
+        id: merge
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git merge --no-edit origin/main; then
+            git push origin develop
+          else
+            git merge --abort
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 충돌 시 직접 머지하지 않고 PR을 생성해 수동으로 해결한다.
+      - name: Create backmerge PR on conflict
+        if: steps.merge.outputs.conflict == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base develop \
+            --head main \
+            --title "chore: backmerge main into develop (conflict)" \
+            --body "main → develop 자동 역머지 중 충돌이 발생했습니다. 충돌을 해결한 뒤 머지해주세요." \
+            || echo "PR already exists"
