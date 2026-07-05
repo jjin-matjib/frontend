@@ -1,0 +1,33 @@
+name: Close linked issues on develop merge
+
+# closes #N 키워드는 기본 브랜치(main) 머지에서만 동작하므로,
+# develop 머지 시에도 연결된 이슈가 닫히도록 직접 처리한다.
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  close-issues:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close issues referenced by closing keywords
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "$PR_BODY" \
+            | grep -oiE '(close[sd]?|fix(e[sd])?|resolve[sd]?)[[:space:]]+#[0-9]+' \
+            | grep -oE '[0-9]+' \
+            | sort -u \
+            | while read -r issue; do
+                gh issue close "$issue" --repo "$REPO" \
+                  --comment "PR #${PR_NUMBER} 가 develop에 머지되어 자동으로 닫습니다." \
+                  || echo "issue #$issue close failed (already closed?)"
+              done
