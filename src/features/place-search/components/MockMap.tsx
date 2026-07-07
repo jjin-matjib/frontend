@@ -73,12 +73,12 @@ export function MockMap({ className }: Props) {
         ))}
 
         {/* Clusters */}
-        <circle cx="200" cy="82" r="18" fill="#b5451e" />
-        <text x="200" y="88" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="sans-serif">
+        <circle cx="200" cy="82" r="12" fill="#b5451e" />
+        <text x="200" y="86" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="sans-serif">
           3
         </text>
-        <circle cx="295" cy="218" r="18" fill="#b5451e" />
-        <text x="295" y="224" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold" fontFamily="sans-serif">
+        <circle cx="295" cy="218" r="12" fill="#b5451e" />
+        <text x="295" y="222" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="sans-serif">
           5
         </text>
       </svg>

@@ -35,7 +35,7 @@ function PinMarker() {
 
 function ClusterBubble({ count }: { count: number }) {
   return (
-    <div className="w-9 h-9 rounded-full bg-place-primary flex items-center justify-center text-place-primary-fg text-sm font-bold shadow-md">
+    <div className="w-6 h-6 rounded-full bg-place-primary flex items-center justify-center text-place-primary-fg text-xs font-bold shadow-md">
       {count}
     </div>
   );
