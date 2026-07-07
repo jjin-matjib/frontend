@@ -9,7 +9,7 @@ export function RecentSearchList() {
         {DUMMY_RECENT_SEARCHES.map((keyword) => (
           <div
             key={keyword}
-            className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-full border border-border bg-white text-sm text-foreground"
+            className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-full border border-border bg-place-surface text-sm text-foreground"
           >
             <Clock className="w-3.5 h-3.5 text-place-primary" />
             <span>{keyword}</span>

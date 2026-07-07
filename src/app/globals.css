@@ -55,13 +55,15 @@
   --color-place-primary: var(--place-primary);
   --color-place-primary-fg: var(--place-primary-fg);
   --color-place-bg: var(--place-bg);
+  --color-place-surface: var(--place-surface);
   --color-place-header: var(--place-header);
 }
 
 :root {
   --place-primary: oklch(0.53 0.15 30);
   --place-primary-fg: oklch(0.98 0 0);
-  --place-bg: oklch(0.96 0.012 75);
+  --place-bg: oklch(0.995 0.003 75);
+  --place-surface: oklch(0.985 0.006 75);
   --place-header: oklch(0.27 0.075 155);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

@@ -9,7 +9,7 @@ export function MapPreview() {
         zoom={MAP_DEFAULT_ZOOM}
         markers={DUMMY_MARKERS}
         clusters={DUMMY_CLUSTERS}
-        className="w-full h-48 rounded-xl overflow-hidden"
+        className="w-full h-48 rounded-xl border border-border overflow-hidden"
       />
     </div>
   );

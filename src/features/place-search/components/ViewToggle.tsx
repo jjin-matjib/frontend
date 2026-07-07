@@ -20,7 +20,7 @@ export function ViewToggle({ tab, onTabChange }: Props) {
             'flex items-center gap-1.5 px-4 py-2 font-medium transition-colors',
             tab === 'list'
               ? 'bg-place-primary text-place-primary-fg'
-              : 'bg-white text-foreground',
+              : 'bg-place-surface text-foreground',
           )}
         >
           <List className="w-4 h-4" />
@@ -33,7 +33,7 @@ export function ViewToggle({ tab, onTabChange }: Props) {
             'flex items-center gap-1.5 px-4 py-2 font-medium transition-colors',
             tab === 'map'
               ? 'bg-place-primary text-place-primary-fg'
-              : 'bg-white text-foreground',
+              : 'bg-place-surface text-foreground',
           )}
         >
           <Map className="w-4 h-4" />

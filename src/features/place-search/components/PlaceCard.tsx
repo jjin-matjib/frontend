@@ -7,7 +7,7 @@ interface Props {
 
 export function PlaceCard({ place }: Props) {
   return (
-    <div className="flex gap-3 bg-white rounded-xl p-3 shadow-sm">
+    <div className="flex gap-3 bg-place-surface rounded-xl p-3 shadow-sm">
       {/* Thumbnail */}
       <div className="w-20 h-20 rounded-lg bg-muted shrink-0 overflow-hidden">
         <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-xs">

@@ -8,7 +8,7 @@ export function FullMap() {
       zoom={MAP_DEFAULT_ZOOM}
       markers={DUMMY_MARKERS}
       clusters={DUMMY_CLUSTERS}
-      className="w-full h-full"
+      className="w-full h-full rounded-xl border border-border"
     />
   );
 }
