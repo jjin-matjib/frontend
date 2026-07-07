@@ -12,15 +12,15 @@ export function FooterNav() {
   const activeTab = 'search';
 
   return (
-    <nav className="flex-shrink-0 flex border-t border-border bg-white">
+    <nav className="shrink-0 h-14 flex border-t border-border bg-white">
       {TABS.map(({ key, label, Icon }) => (
         <button
           key={key}
           type="button"
           className={cn(
-            'flex flex-1 flex-col items-center gap-1 pt-2 pb-3 text-xs font-medium transition-colors',
+            'flex flex-1 flex-col items-center justify-center gap-1 text-xs font-medium transition-colors',
             key === activeTab
-              ? 'text-place-primary border-t-2 border-place-primary -mt-px'
+              ? 'text-place-primary border-t-2 border-place-primary'
               : 'text-muted-foreground',
           )}
         >

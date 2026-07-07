@@ -18,28 +18,28 @@ export function PlaceSearchPage() {
   const hasResults = query !== null;
 
   return (
-    <main className="flex flex-1 flex-col overflow-hidden bg-place-bg">
+    <main className="flex flex-col h-dvh overflow-hidden bg-place-bg w-full">
       {/* 헤더 placeholder — 별도 담당자 구현 예정 */}
-      <div className="flex-shrink-0 h-20 bg-white px-4 flex flex-col justify-center">
-        <div className="h-7 w-32 rounded bg-muted" />
-        <div className="h-4 w-24 rounded bg-muted mt-1" />
+      <div className="shrink-0 h-20 bg-white px-4 flex flex-col justify-center border-b border-border">
+        <div className="h-6 w-28 rounded-md bg-muted" />
+        <div className="h-3.5 w-20 rounded bg-muted mt-1.5" />
       </div>
 
       {/* 검색 입력 영역 placeholder — 별도 담당자 구현 예정 */}
-      <div className="flex-shrink-0 bg-white px-4 py-3 flex items-center gap-2 border-b border-border">
-        <div className="flex flex-1 items-center gap-2 rounded-full border border-border px-4 h-10 bg-white">
+      <div className="shrink-0 bg-white px-4 py-3 flex items-center gap-2 border-b border-border">
+        <div className="flex flex-1 items-center gap-2 rounded-full border border-border px-3 h-11 bg-white min-w-0">
           <Search className="w-4 h-4 text-muted-foreground shrink-0" />
-          <span className="text-sm text-muted-foreground">가게명, 지역, 지하철역 검색</span>
+          <span className="text-sm text-muted-foreground truncate">가게명, 지역, 지하철역 검색</span>
         </div>
         <button
           type="button"
-          className="flex items-center justify-center w-10 h-10 rounded-lg border border-border bg-white"
+          className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl border border-border bg-white"
         >
           <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
         </button>
         <button
           type="button"
-          className="flex items-center gap-1 px-3 h-10 rounded-lg border border-border bg-white text-sm text-muted-foreground"
+          className="shrink-0 flex items-center gap-1 px-3 h-11 rounded-xl border border-border bg-white text-sm text-muted-foreground whitespace-nowrap"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           초기화
@@ -50,7 +50,7 @@ export function PlaceSearchPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {hasResults ? (
           <>
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <ResultHeader count={DUMMY_PLACES.length} />
               <ViewToggle tab={tab} onTabChange={setTab} />
             </div>
@@ -68,7 +68,7 @@ export function PlaceSearchPage() {
           </>
         ) : (
           <>
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <RecentSearchList />
               <ViewToggle tab={tab} onTabChange={setTab} />
             </div>
@@ -83,11 +83,12 @@ export function PlaceSearchPage() {
       <FooterNav />
 
       {/* 최근 본 장소 플로팅 버튼 placeholder — 별도 담당자 구현 예정 */}
-      <div className="fixed bottom-20 right-4 z-50 flex flex-col items-center gap-1">
-        <div className="w-14 h-14 rounded-full bg-white shadow-lg flex flex-col items-center justify-center">
+      {/* bottom: footer(~56px) + gap(12px) = 68px */}
+      <div className="fixed bottom-[68px] right-4 z-50">
+        <div className="w-14 h-14 rounded-full bg-white shadow-lg flex flex-col items-center justify-center gap-0.5">
           <Clock className="w-5 h-5 text-place-primary" />
-          <span className="text-[10px] text-muted-foreground leading-tight">최근 본</span>
-          <span className="text-[10px] text-muted-foreground leading-tight">장소</span>
+          <span className="text-[10px] leading-none text-muted-foreground">최근 본</span>
+          <span className="text-[10px] leading-none text-muted-foreground">장소</span>
         </div>
       </div>
     </main>
