@@ -23,9 +23,9 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${pretendard.variable} h-full antialiased`}
+      className={`${pretendard.variable} h-full antialiased bg-muted`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="h-full flex flex-col max-w-[375px] mx-auto bg-background">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -18,7 +18,7 @@ export function PlaceSearchPage() {
   const hasResults = query !== null;
 
   return (
-    <main className="flex flex-col h-dvh overflow-hidden bg-place-bg w-full">
+    <main className="relative flex flex-col h-dvh overflow-hidden bg-place-bg w-full">
       {/* 헤더 placeholder — 별도 담당자 구현 예정 */}
       <div className="shrink-0 h-20 bg-white px-4 flex flex-col justify-center border-b border-border">
         <div className="h-6 w-28 rounded-md bg-muted" />
@@ -83,8 +83,8 @@ export function PlaceSearchPage() {
       <FooterNav />
 
       {/* 최근 본 장소 플로팅 버튼 placeholder — 별도 담당자 구현 예정 */}
-      {/* bottom: footer(~56px) + gap(12px) = 68px */}
-      <div className="fixed bottom-[68px] right-4 z-50">
+      {/* bottom: footer(56px) + gap(12px) = 68px */}
+      <div className="absolute bottom-[68px] right-4 z-50">
         <div className="w-14 h-14 rounded-full bg-white shadow-lg flex flex-col items-center justify-center gap-0.5">
           <Clock className="w-5 h-5 text-place-primary" />
           <span className="text-[10px] leading-none text-muted-foreground">최근 본</span>
