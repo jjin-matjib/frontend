@@ -3,13 +3,23 @@
 import { useRef, useState } from 'react';
 import { RotateCcw, Search, SlidersHorizontal } from 'lucide-react';
 import { useQueryState } from 'nuqs';
+import type { AutocompleteSuggestion } from '../hooks/usePlaceAutocomplete';
 import { usePlaceAutocomplete } from '../hooks/usePlaceAutocomplete';
 
-export function SearchBar() {
+interface Props {
+  mockSuggestions?: AutocompleteSuggestion[];
+}
+
+export function SearchBar({ mockSuggestions }: Props) {
   const [query, setQuery] = useQueryState('q');
   const [input, setInput] = useState(query ?? '');
   const [open, setOpen] = useState(false);
-  const suggestions = usePlaceAutocomplete(input);
+  const apiSuggestions = usePlaceAutocomplete(mockSuggestions ? '' : input);
+  const suggestions = mockSuggestions
+    ? mockSuggestions.filter((s) =>
+        s.mainText.toLowerCase().includes(input.toLowerCase()),
+      )
+    : apiSuggestions;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const submit = (value: string) => {
