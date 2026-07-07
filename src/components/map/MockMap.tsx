@@ -63,21 +63,21 @@ export function MockMap({ className }: Props) {
           { cx: 65, cy: 238 },
         ].map(({ cx, cy }, i) => (
           <g key={i}>
-            <circle cx={cx} cy={cy} r="13" fill="#b5451e" />
+            <circle cx={cx} cy={cy} r="13" fill="#c4522a" />
             <circle cx={cx} cy={cy} r="5" fill="white" />
             <polygon
               points={`${cx},${cy + 18} ${cx - 8},${cy + 4} ${cx + 8},${cy + 4}`}
-              fill="#b5451e"
+              fill="#c4522a"
             />
           </g>
         ))}
 
         {/* Clusters */}
-        <circle cx="200" cy="82" r="12" fill="#b5451e" />
+        <circle cx="200" cy="82" r="12" fill="#c4522a" />
         <text x="200" y="86" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="sans-serif">
           3
         </text>
-        <circle cx="295" cy="218" r="12" fill="#b5451e" />
+        <circle cx="295" cy="218" r="12" fill="#c4522a" />
         <text x="295" y="222" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="sans-serif">
           5
         </text>

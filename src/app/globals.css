@@ -59,10 +59,10 @@
 }
 
 :root {
-  --place-primary: oklch(0.52 0.145 42);
+  --place-primary: oklch(0.53 0.15 30);
   --place-primary-fg: oklch(0.98 0 0);
-  --place-bg: oklch(0.97 0.012 80);
-  --place-header: oklch(0.28 0.07 155);
+  --place-bg: oklch(0.96 0.012 75);
+  --place-header: oklch(0.27 0.075 155);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
