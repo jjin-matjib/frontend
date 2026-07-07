@@ -21,7 +21,7 @@ export function PlaceSearchPage() {
     <main className="relative flex flex-col h-dvh overflow-hidden bg-place-bg w-full">
       {/* 헤더 placeholder — 별도 담당자 구현 예정 */}
       <div className="shrink-0 h-20 bg-white px-4 flex flex-col justify-center border-b border-border">
-        <div className="h-6 w-28 rounded-md bg-muted" />
+        <p className="text-xl font-bold text-place-header">먹지도</p>
         <div className="h-3.5 w-20 rounded bg-muted mt-1.5" />
       </div>
 
