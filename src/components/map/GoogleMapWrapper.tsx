@@ -1,6 +1,7 @@
 'use client';
 
-import { AdvancedMarker, APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
+import { AdvancedMarker, APIProvider, Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { MapCluster, MapMarker } from '@/types/map';
 import { MockMap } from './MockMap';
@@ -10,14 +11,21 @@ interface Props {
   clusters: MapCluster[];
   center: { lat: number; lng: number };
   zoom: number;
+  fitMarkers?: boolean;
+  onMarkerClick?: (id: string) => void;
+  selectedMarkerId?: string;
   className?: string;
 }
 
-function PinMarker() {
+function PinMarker({ selected }: { selected?: boolean }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="w-7 h-7 rounded-full bg-place-primary flex items-center justify-center shadow-sm">
-        <div className="w-2.5 h-2.5 rounded-full bg-place-primary-fg" />
+      <div
+        className={`w-7 h-7 rounded-full flex items-center justify-center shadow-sm transition-transform bg-place-primary ${
+          selected ? 'scale-125' : ''
+        }`}
+      >
+        <div className={`rounded-full bg-place-primary-fg ${selected ? 'w-3 h-3' : 'w-2.5 h-2.5'}`} />
       </div>
       <div
         style={{
@@ -33,44 +41,81 @@ function PinMarker() {
   );
 }
 
-function ClusterBubble({ count, onClick }: { count: number; onClick: () => void }) {
+function ClusterBubble({ count }: { count: number }) {
   return (
-    <div
-      onClick={onClick}
-      className="w-6 h-6 rounded-full bg-place-primary flex items-center justify-center text-place-primary-fg text-xs font-bold shadow-md cursor-pointer"
-    >
+    <div className="w-6 h-6 rounded-full bg-place-primary flex items-center justify-center text-place-primary-fg text-xs font-bold shadow-md cursor-pointer">
       {count}
     </div>
   );
 }
 
-function MapContent({ markers, clusters }: { markers: MapMarker[]; clusters: MapCluster[] }) {
-  const map = useMap();
+interface MapContentProps {
+  markers: MapMarker[];
+  clusters: MapCluster[];
+  onClusterClick: (cluster: MapCluster) => void;
+  onMarkerClick?: (id: string) => void;
+  selectedMarkerId?: string;
+  fitMarkers?: boolean;
+}
 
-  const handleClusterClick = (cluster: MapCluster) => {
-    if (!map) return;
-    map.panTo({ lat: cluster.lat, lng: cluster.lng });
-    map.setZoom((map.getZoom() ?? 12) + 2);
-  };
+function MapContent({ markers, clusters, onClusterClick, onMarkerClick, selectedMarkerId, fitMarkers }: MapContentProps) {
+  const map = useMap();
+  const coreLib = useMapsLibrary('core');
+
+  useEffect(() => {
+    if (!map || !coreLib || !fitMarkers || markers.length === 0) return;
+    if (markers.length === 1) {
+      map.panTo({ lat: markers[0].lat, lng: markers[0].lng });
+      map.setZoom(15);
+      return;
+    }
+    const bounds = new coreLib.LatLngBounds();
+    markers.forEach((m) => bounds.extend({ lat: m.lat, lng: m.lng }));
+    map.fitBounds(bounds, 24);
+  }, [map, coreLib, markers, fitMarkers]);
 
   return (
     <>
       {markers.map((m) => (
-        <AdvancedMarker key={m.id} position={{ lat: m.lat, lng: m.lng }}>
-          <PinMarker />
+        <AdvancedMarker
+          key={m.id}
+          position={{ lat: m.lat, lng: m.lng }}
+          onClick={() => onMarkerClick?.(m.id)}
+        >
+          <PinMarker selected={selectedMarkerId === m.id} />
         </AdvancedMarker>
       ))}
       {clusters.map((c) => (
-        <AdvancedMarker key={c.id} position={{ lat: c.lat, lng: c.lng }}>
-          <ClusterBubble count={c.count} onClick={() => handleClusterClick(c)} />
+        <AdvancedMarker
+          key={c.id}
+          position={{ lat: c.lat, lng: c.lng }}
+          onClick={() => onClusterClick(c)}
+        >
+          <ClusterBubble count={c.count} />
         </AdvancedMarker>
       ))}
     </>
   );
 }
 
-export function GoogleMapWrapper({ markers, clusters, center, zoom, className }: Props) {
+export function GoogleMapWrapper({
+  markers,
+  clusters,
+  center,
+  zoom,
+  fitMarkers,
+  onMarkerClick,
+  selectedMarkerId,
+  className,
+}: Props) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
+  const [mapCenter, setMapCenter] = useState(center);
+  const [mapZoom, setMapZoom] = useState(zoom);
+
+  const handleClusterClick = (cluster: MapCluster) => {
+    setMapCenter({ lat: cluster.lat, lng: cluster.lng });
+    setMapZoom((z) => z + 2);
+  };
 
   if (!apiKey) {
     return <MockMap markers={markers} clusters={clusters} className={className} />;
@@ -80,14 +125,25 @@ export function GoogleMapWrapper({ markers, clusters, center, zoom, className }:
     <div className={cn('relative overflow-hidden', className)}>
       <APIProvider apiKey={apiKey}>
         <Map
-          defaultCenter={center}
-          defaultZoom={zoom}
+          center={mapCenter}
+          zoom={mapZoom}
+          onCameraChanged={(e) => {
+            setMapCenter(e.detail.center);
+            setMapZoom(e.detail.zoom);
+          }}
           mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID}
           gestureHandling="greedy"
           disableDefaultUI
           style={{ width: '100%', height: '100%' }}
         >
-          <MapContent markers={markers} clusters={clusters} />
+          <MapContent
+            markers={markers}
+            clusters={clusters}
+            onClusterClick={handleClusterClick}
+            onMarkerClick={onMarkerClick}
+            selectedMarkerId={selectedMarkerId}
+            fitMarkers={fitMarkers}
+          />
         </Map>
       </APIProvider>
     </div>

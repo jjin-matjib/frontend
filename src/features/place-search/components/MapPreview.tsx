@@ -26,7 +26,8 @@ export function MapPreview({ markers }: Props) {
         zoom={MAP_DEFAULT_ZOOM}
         markers={pins}
         clusters={clusters}
-        className="w-full h-24 rounded-xl border border-border overflow-hidden"
+        fitMarkers
+        className="w-full h-34 rounded-xl border border-border overflow-hidden"
       />
     </div>
   );

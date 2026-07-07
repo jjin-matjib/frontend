@@ -85,7 +85,7 @@ export function PlaceSearchPage() {
               </>
             ) : (
               <div className="flex-1 overflow-hidden p-3">
-                <FullMap markers={markers} />
+                <FullMap markers={markers} places={places} />
               </div>
             )}
           </>
