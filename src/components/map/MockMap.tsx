@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import type { MapCluster, MapMarker } from '../types';
+import type { MapCluster, MapMarker } from '@/types/map';
 
 interface Props {
   markers?: MapMarker[];

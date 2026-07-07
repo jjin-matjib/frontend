@@ -1,5 +1,5 @@
+import { GoogleMapWrapper } from '@/components/map';
 import { DUMMY_CLUSTERS, DUMMY_MARKERS, MAP_CENTER, MAP_DEFAULT_ZOOM } from '../constants/dummy-markers';
-import { GoogleMapWrapper } from './GoogleMapWrapper';
 
 export function FullMap() {
   return (

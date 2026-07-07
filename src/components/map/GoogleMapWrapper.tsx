@@ -2,7 +2,7 @@
 
 import { AdvancedMarker, APIProvider, Map } from '@vis.gl/react-google-maps';
 import { cn } from '@/lib/utils';
-import type { MapCluster, MapMarker } from '../types';
+import type { MapCluster, MapMarker } from '@/types/map';
 import { MockMap } from './MockMap';
 
 interface Props {
