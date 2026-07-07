@@ -25,10 +25,14 @@ export function PlaceCard({ place }: Props) {
         </div>
 
         <div className="flex items-center gap-1.5 mb-1">
-          <span className="text-xs px-1.5 py-0.5 rounded-full bg-place-primary/10 text-place-primary font-medium">
-            현재 영업중
-          </span>
-          <span className="text-xs text-muted-foreground">· {place.hours}</span>
+          {place.isOpen && (
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-place-primary/10 text-place-primary font-medium">
+              현재 영업중
+            </span>
+          )}
+          {place.hours && (
+            <span className="text-xs text-muted-foreground">{place.hours}</span>
+          )}
         </div>
 
         <div className="flex items-center gap-1 text-xs text-muted-foreground">

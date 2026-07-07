@@ -1,6 +1,6 @@
 'use client';
 
-import { AdvancedMarker, APIProvider, Map } from '@vis.gl/react-google-maps';
+import { AdvancedMarker, APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
 import { cn } from '@/lib/utils';
 import type { MapCluster, MapMarker } from '@/types/map';
 import { MockMap } from './MockMap';
@@ -33,11 +33,39 @@ function PinMarker() {
   );
 }
 
-function ClusterBubble({ count }: { count: number }) {
+function ClusterBubble({ count, onClick }: { count: number; onClick: () => void }) {
   return (
-    <div className="w-6 h-6 rounded-full bg-place-primary flex items-center justify-center text-place-primary-fg text-xs font-bold shadow-md">
+    <div
+      onClick={onClick}
+      className="w-6 h-6 rounded-full bg-place-primary flex items-center justify-center text-place-primary-fg text-xs font-bold shadow-md cursor-pointer"
+    >
       {count}
     </div>
+  );
+}
+
+function MapContent({ markers, clusters }: { markers: MapMarker[]; clusters: MapCluster[] }) {
+  const map = useMap();
+
+  const handleClusterClick = (cluster: MapCluster) => {
+    if (!map) return;
+    map.panTo({ lat: cluster.lat, lng: cluster.lng });
+    map.setZoom((map.getZoom() ?? 12) + 2);
+  };
+
+  return (
+    <>
+      {markers.map((m) => (
+        <AdvancedMarker key={m.id} position={{ lat: m.lat, lng: m.lng }}>
+          <PinMarker />
+        </AdvancedMarker>
+      ))}
+      {clusters.map((c) => (
+        <AdvancedMarker key={c.id} position={{ lat: c.lat, lng: c.lng }}>
+          <ClusterBubble count={c.count} onClick={() => handleClusterClick(c)} />
+        </AdvancedMarker>
+      ))}
+    </>
   );
 }
 
@@ -59,16 +87,7 @@ export function GoogleMapWrapper({ markers, clusters, center, zoom, className }:
           disableDefaultUI
           style={{ width: '100%', height: '100%' }}
         >
-          {markers.map((m) => (
-            <AdvancedMarker key={m.id} position={{ lat: m.lat, lng: m.lng }}>
-              <PinMarker />
-            </AdvancedMarker>
-          ))}
-          {clusters.map((c) => (
-            <AdvancedMarker key={c.id} position={{ lat: c.lat, lng: c.lng }}>
-              <ClusterBubble count={c.count} />
-            </AdvancedMarker>
-          ))}
+          <MapContent markers={markers} clusters={clusters} />
         </Map>
       </APIProvider>
     </div>

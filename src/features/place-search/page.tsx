@@ -1,66 +1,63 @@
 'use client';
 
-import { Clock, RotateCcw, Search, SlidersHorizontal } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { useQueryState } from 'nuqs';
-import { DUMMY_PLACES } from './constants/dummy-places';
 import { FooterNav } from './components/FooterNav';
 import { FullMap } from './components/FullMap';
 import { MapPreview } from './components/MapPreview';
 import { PlaceList } from './components/PlaceList';
 import { ResultHeader } from './components/ResultHeader';
+import { SearchBar } from './components/SearchBar';
 import { ViewToggle } from './components/ViewToggle';
+import { usePlaceSearch } from './hooks/usePlaceSearch';
 import { useViewTab } from './hooks/useViewTab';
 
 export function PlaceSearchPage() {
   const [tab, setTab] = useViewTab();
   const [query] = useQueryState('q');
   const hasResults = query !== null;
+  const { places, loading, error } = usePlaceSearch(query);
+  const markers = places.map((p) => ({ id: p.id, lat: p.lat, lng: p.lng }));
 
   return (
-    <main className="relative flex flex-col h-dvh overflow-hidden bg-place-bg w-full">
+    <main className="relative flex flex-col h-dvh bg-place-bg w-full">
       {/* 헤더 placeholder — 별도 담당자 구현 예정 */}
       <div className="shrink-0 h-14 bg-place-surface px-4 flex items-center">
         <p className="text-xl font-bold text-place-header">먹지도</p>
       </div>
 
-      {/* 검색 입력 영역 placeholder — 별도 담당자 구현 예정 */}
-      <div className="shrink-0 bg-place-surface px-4 py-3 flex items-center gap-2 border-b border-border">
-        <div className="flex flex-1 items-center gap-2 rounded-xl border border-border px-3 h-11 bg-white min-w-0">
-          <Search className="w-4 h-4 text-muted-foreground shrink-0" />
-          <span className="text-sm text-muted-foreground truncate">가게명, 지역, 지하철역 검색</span>
-        </div>
-        <button
-          type="button"
-          className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl border border-border bg-white"
-        >
-          <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
-        </button>
-        <button
-          type="button"
-          className="shrink-0 flex items-center gap-1 px-3 h-11 rounded-xl border border-border bg-white text-sm text-muted-foreground whitespace-nowrap"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          초기화
-        </button>
-      </div>
+      {/* 검색 입력 영역 */}
+      <SearchBar />
 
       {/* 콘텐츠 영역 */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {hasResults ? (
           <>
             <div className="shrink-0">
-              <ResultHeader count={DUMMY_PLACES.length} />
+              <ResultHeader count={places.length} />
               <ViewToggle tab={tab} onTabChange={setTab} />
             </div>
 
             {tab === 'list' ? (
-              <div className="flex-1 overflow-y-auto">
-                <MapPreview />
-                <PlaceList places={DUMMY_PLACES} />
-              </div>
+              <>
+                <div className="shrink-0">
+                  <MapPreview markers={markers} />
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  {loading ? (
+                    <p className="text-center text-sm text-muted-foreground py-10">검색 중...</p>
+                  ) : error ? (
+                    <p className="text-center text-sm text-destructive py-10">{error}</p>
+                  ) : places.length > 0 ? (
+                    <PlaceList places={places} />
+                  ) : (
+                    <p className="text-center text-sm text-muted-foreground py-10">검색 결과가 없습니다.</p>
+                  )}
+                </div>
+              </>
             ) : (
               <div className="flex-1 overflow-hidden p-3">
-                <FullMap />
+                <FullMap markers={markers} />
               </div>
             )}
           </>
