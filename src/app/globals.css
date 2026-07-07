@@ -52,9 +52,17 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --color-place-primary: var(--place-primary);
+  --color-place-primary-fg: var(--place-primary-fg);
+  --color-place-bg: var(--place-bg);
+  --color-place-header: var(--place-header);
 }
 
 :root {
+  --place-primary: oklch(0.52 0.145 42);
+  --place-primary-fg: oklch(0.98 0 0);
+  --place-bg: oklch(0.97 0.012 80);
+  --place-header: oklch(0.28 0.07 155);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

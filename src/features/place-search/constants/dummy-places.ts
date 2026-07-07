@@ -1,0 +1,58 @@
+import type { Place } from '../types';
+
+export const DUMMY_PLACES: Place[] = [
+  {
+    id: '1',
+    name: '성수 파스타',
+    category: '파스타',
+    isOpen: true,
+    hours: '11:00 - 22:00',
+    rating: 4.6,
+    reviewCount: 128,
+    tags: ['조용한 분위기', '와이파이', '콘센트'],
+    distanceKm: 0.3,
+    lat: 37.5444,
+    lng: 127.0557,
+  },
+  {
+    id: '2',
+    name: '건대 카페',
+    category: '카페',
+    isOpen: true,
+    hours: '10:00 - 21:00',
+    rating: 4.4,
+    reviewCount: 96,
+    tags: ['테라스', '반려동물 동반', '디저트 맛집'],
+    distanceKm: 0.5,
+    lat: 37.5404,
+    lng: 127.0699,
+  },
+  {
+    id: '3',
+    name: '잠실 술집',
+    category: '술집',
+    isOpen: true,
+    hours: '17:00 - 01:00',
+    rating: 4.3,
+    reviewCount: 87,
+    tags: ['넓은 좌석', '콘센트', '디저트 맛집'],
+    distanceKm: 0.7,
+    lat: 37.5132,
+    lng: 127.1005,
+  },
+  {
+    id: '4',
+    name: '뚝섬 카페거리',
+    category: '카페',
+    isOpen: true,
+    hours: '09:00 - 20:30',
+    rating: 4.2,
+    reviewCount: 74,
+    tags: ['뷰 맛집', '루프탑', '브런치'],
+    distanceKm: 0.9,
+    lat: 37.5469,
+    lng: 127.0681,
+  },
+];
+
+export const DUMMY_RECENT_SEARCHES = ['성수 파스타', '건대 카페', '잠실 술집'];
