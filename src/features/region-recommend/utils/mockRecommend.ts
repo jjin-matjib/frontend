@@ -1,8 +1,35 @@
 import { MAX_MATRIX_DESTINATIONS } from "../constants/config";
+import { RESTAURANT_POOL } from "../constants/dummy-restaurants";
 import { STATION_OPTIONS } from "../constants/stations";
-import type { OriginTravel, RecommendInput, RecommendResult } from "../types";
+import type {
+  OriginTravel,
+  RecommendInput,
+  RecommendResult,
+  Restaurant,
+} from "../types";
 import { haversine, prefilterByHaversine } from "./geo";
 import { rankZones, type ScorableZone } from "./score";
+
+function hashString(s: string): number {
+  let hash = 0;
+  for (const ch of s) hash = (hash * 31 + ch.charCodeAt(0)) % 100000;
+  return hash;
+}
+
+/** 추천 권역별로 더미 맛집을 결정적으로 뽑아 리스트업한다(평점순 정렬). */
+function buildMockRestaurants(zoneId: string): Restaurant[] {
+  const start = hashString(zoneId) % RESTAURANT_POOL.length;
+  const picked: Restaurant[] = [];
+  for (let i = 0; i < 6; i++) {
+    const idx = (start + i) % RESTAURANT_POOL.length;
+    const base = RESTAURANT_POOL[idx];
+    const distanceM = 120 + (hashString(zoneId + base.name) % 9) * 60; // 120~600m
+    picked.push({ id: `${zoneId}-${idx}`, ...base, distanceM });
+  }
+  return picked.sort(
+    (a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount,
+  );
+}
 
 /** 역 id에서 결정적으로 맛집 수를 만든다(무작위 X — 테스트 안정성). */
 function pseudoRestaurantCount(id: string): number {
@@ -51,5 +78,9 @@ export function buildMockResult(input: RecommendInput): RecommendResult {
   });
 
   const ranked = rankZones(scorable);
-  return { recommended: ranked[0], candidates: ranked };
+  return {
+    recommended: ranked[0],
+    candidates: ranked,
+    restaurants: buildMockRestaurants(ranked[0].id),
+  };
 }

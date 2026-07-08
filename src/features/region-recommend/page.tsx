@@ -8,6 +8,7 @@ import { RecommendResultCard } from "./components/RecommendResultCard";
 import { RecommendSkeleton } from "./components/RecommendSkeleton";
 import { RegionHeader } from "./components/RegionHeader";
 import { RegionMap } from "./components/RegionMap";
+import { RestaurantList } from "./components/RestaurantList";
 import { useRegionRecommendQuery } from "./hooks/useRegionRecommendQuery";
 import type { RecommendInput } from "./types";
 
@@ -56,6 +57,12 @@ export function RegionRecommendPage() {
             participantCount={participantCount}
           />
           <RegionMap origins={input.origins} recommended={data.recommended} />
+          {data.restaurants && data.restaurants.length > 0 && (
+            <RestaurantList
+              zoneName={data.recommended.name}
+              restaurants={data.restaurants}
+            />
+          )}
         </div>
       )}
     </main>

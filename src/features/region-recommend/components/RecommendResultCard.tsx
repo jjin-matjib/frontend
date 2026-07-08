@@ -2,9 +2,7 @@
 
 import { Collapsible } from "@base-ui/react/collapsible";
 import { ChevronDown, Clock, Utensils } from "lucide-react";
-import Link from "next/link";
 import type { RankedZone } from "../types";
-import { buildPlaceSearchUrl } from "../utils/handoff";
 
 interface Props {
   zone: RankedZone;
@@ -61,13 +59,6 @@ export function RecommendResultCard({ zone, participantCount }: Props) {
             </ul>
           </Collapsible.Panel>
         </Collapsible.Root>
-
-        <Link
-          href={buildPlaceSearchUrl(zone)}
-          className="mt-1 inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          이 지역 맛집 보기
-        </Link>
       </div>
     </section>
   );

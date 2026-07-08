@@ -60,8 +60,21 @@ export interface RankedZone {
   perOrigin: OriginTravel[];
 }
 
+/** 추천 권역의 맛집 한 곳 */
+export interface Restaurant {
+  id: string;
+  name: string;
+  category: string;
+  rating: number;
+  reviewCount: number;
+  /** 추천 권역 중심으로부터의 거리(m) */
+  distanceM: number;
+}
+
 /** POST /api/region/recommend 응답 본문의 result */
 export interface RecommendResult {
   recommended: RankedZone;
   candidates: RankedZone[];
+  /** 추천 권역의 맛집 리스트(현재 Mock. 실 API 연동·랭킹 근거는 기획 확정 후). */
+  restaurants?: Restaurant[];
 }
