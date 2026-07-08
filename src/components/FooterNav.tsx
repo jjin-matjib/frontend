@@ -18,10 +18,10 @@ export function FooterNav() {
           key={key}
           type="button"
           className={cn(
-            'flex flex-1 flex-col items-center justify-center gap-1 text-xs font-medium transition-colors',
+            'flex flex-1 flex-col items-center justify-center gap-1 text-xs font-medium transition-colors hover:bg-muted/50',
             key === activeTab
               ? 'text-place-primary border-t-2 border-place-primary'
-              : 'text-muted-foreground',
+              : 'text-place-icon-muted',
           )}
         >
           <Icon className="w-5 h-5" />

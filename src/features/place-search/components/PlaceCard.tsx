@@ -17,7 +17,7 @@ interface CategoryConfig {
 }
 
 function getCategoryConfig(category: string): CategoryConfig {
-  const bg = 'bg-place-primary/10';
+  const bg = 'bg-place-map-bg';
   if (category.includes('카페') || category.includes('커피') || category.includes('찻집') || category.includes('차'))
     return { icon: Coffee, bg, color: 'text-amber-600' };
   if (category.includes('베이커리') || category.includes('패스트리') || category.includes('디저트'))
@@ -37,7 +37,7 @@ export function PlaceCard({ place }: Props) {
   const { icon: Icon, bg, color } = getCategoryConfig(place.category);
 
   return (
-    <div className="flex gap-3 bg-place-surface rounded-xl p-3 shadow-sm">
+    <div className="flex gap-3 bg-place-surface rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
       <div className={`w-20 h-20 rounded-lg shrink-0 flex items-center justify-center ${bg}`}>
         <Icon className={`w-8 h-8 ${color}`} />
       </div>
@@ -51,7 +51,7 @@ export function PlaceCard({ place }: Props) {
 
         <div className="flex items-center gap-1.5 mb-1">
           {place.isOpen && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-place-primary/10 text-place-primary font-medium">
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-place-open-bg text-place-open font-medium">
               현재 영업중
             </span>
           )}

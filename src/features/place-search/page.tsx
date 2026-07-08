@@ -34,7 +34,7 @@ export function PlaceSearchPage() {
   return (
     <main className="relative flex flex-col h-dvh bg-place-bg w-full">
       {/* 헤더 placeholder — 별도 담당자 구현 예정 */}
-      <div className="shrink-0 h-14 bg-place-surface px-4 flex items-center gap-3">
+      <div className="shrink-0 h-14 px-4 flex items-center gap-3">
         <p className="text-xl font-bold text-place-header">먹지도</p>
         {isDev && (
           <button
@@ -42,8 +42,8 @@ export function PlaceSearchPage() {
             onClick={() => setUseMock((v) => !v)}
             className={`ml-auto text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
               useMock
-                ? 'bg-muted text-muted-foreground border-border'
-                : 'bg-place-primary/10 text-place-primary border-place-primary/30'
+                ? 'bg-muted text-muted-foreground border-border hover:bg-muted/70'
+                : 'bg-place-primary/10 text-place-primary border-place-primary/30 hover:bg-place-primary/20'
             }`}
           >
             {useMock ? 'MOCK' : 'API'}
@@ -56,7 +56,7 @@ export function PlaceSearchPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {hasResults ? (
           <>
-            <div className="shrink-0">
+            <div className="shrink-0 flex items-center justify-between px-4 py-2">
               <ResultHeader count={places.length} />
               <ViewToggle tab={tab} onTabChange={setTab} />
             </div>
@@ -86,8 +86,8 @@ export function PlaceSearchPage() {
           </>
         ) : (
           <>
-            <div className="shrink-0">
-              <ViewToggle tab={tab} onTabChange={setTab} listDisabled />
+            <div className="shrink-0 flex justify-end px-4 py-2">
+              <ViewToggle tab={tab} onTabChange={setTab} />
             </div>
             <div className="flex-1 overflow-hidden p-3">
               <FullMap markers={[]} />
@@ -101,10 +101,9 @@ export function PlaceSearchPage() {
       {/* 최근 본 장소 플로팅 버튼 placeholder — 별도 담당자 구현 예정 */}
       {/* bottom: footer(56px) + gap(12px) = 68px */}
       <div className="absolute bottom-[68px] right-4 z-50">
-        <div className="w-14 h-14 rounded-full bg-place-surface shadow-lg flex flex-col items-center justify-center gap-0.5">
-          <Clock className="w-5 h-5 text-place-primary" />
-          <span className="text-[10px] leading-none text-muted-foreground">최근 본</span>
-          <span className="text-[10px] leading-none text-muted-foreground">장소</span>
+        <div className="h-10 px-3 rounded-full bg-place-surface shadow-lg flex items-center gap-1.5">
+          <Clock className="w-4 h-4 text-place-marker shrink-0" />
+          <span className="text-xs text-muted-foreground whitespace-nowrap">최근 본 장소</span>
         </div>
       </div>
     </main>

@@ -13,8 +13,8 @@ export function RecentSearchList() {
           >
             <Clock className="w-3.5 h-3.5 text-place-primary" />
             <span>{keyword}</span>
-            <button type="button" aria-label={`${keyword} 삭제`}>
-              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            <button type="button" aria-label={`${keyword} 삭제`} className="hover:text-foreground text-muted-foreground transition-colors">
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         ))}

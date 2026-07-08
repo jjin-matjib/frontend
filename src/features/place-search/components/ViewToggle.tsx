@@ -7,23 +7,19 @@ import type { ViewTab } from '../types';
 interface Props {
   tab: ViewTab;
   onTabChange: (tab: ViewTab) => void;
-  listDisabled?: boolean;
 }
 
-export function ViewToggle({ tab, onTabChange, listDisabled }: Props) {
+export function ViewToggle({ tab, onTabChange }: Props) {
   return (
-    <div className="flex justify-end px-4 py-2">
-      <div className="flex rounded-lg border border-border overflow-hidden text-sm">
+    <div className="flex rounded-lg border border-border overflow-hidden text-sm">
         <button
           type="button"
           onClick={() => onTabChange('list')}
-          disabled={listDisabled}
           className={cn(
             'flex items-center gap-1.5 px-4 py-2 font-medium transition-colors',
             tab === 'list'
               ? 'bg-place-primary text-place-primary-fg'
-              : 'bg-place-surface text-foreground',
-            listDisabled && 'opacity-30 cursor-not-allowed',
+              : 'bg-place-surface text-muted-foreground hover:bg-muted',
           )}
         >
           <List className="w-4 h-4" />
@@ -36,13 +32,12 @@ export function ViewToggle({ tab, onTabChange, listDisabled }: Props) {
             'flex items-center gap-1.5 px-4 py-2 font-medium transition-colors',
             tab === 'map'
               ? 'bg-place-primary text-place-primary-fg'
-              : 'bg-place-surface text-foreground',
+              : 'bg-place-surface text-muted-foreground hover:bg-muted',
           )}
         >
           <Map className="w-4 h-4" />
           지도
         </button>
-      </div>
     </div>
   );
 }

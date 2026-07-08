@@ -37,8 +37,8 @@ export function SearchBar({ mockSuggestions }: Props) {
   };
 
   return (
-    <div className="shrink-0 bg-place-surface px-4 py-3 flex items-center gap-2 border-b border-border relative">
-      <div className="flex flex-1 items-center gap-2 rounded-xl border border-border px-3 h-11 bg-white min-w-0">
+    <div className="shrink-0 px-4 py-3 flex items-center gap-2 relative">
+      <div className="flex flex-1 items-center gap-2 rounded-xl border border-border px-3 h-11 bg-place-bg min-w-0">
         <Search className="w-4 h-4 text-muted-foreground shrink-0" />
         <input
           ref={inputRef}
@@ -60,7 +60,7 @@ export function SearchBar({ mockSuggestions }: Props) {
 
       <button
         type="button"
-        className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl border border-border bg-white"
+        className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl border border-border bg-place-bg hover:bg-muted transition-colors"
       >
         <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
       </button>
@@ -68,14 +68,13 @@ export function SearchBar({ mockSuggestions }: Props) {
       <button
         type="button"
         onClick={reset}
-        className="shrink-0 flex items-center gap-1 px-3 h-11 rounded-xl border border-border bg-white text-sm text-muted-foreground whitespace-nowrap"
+        className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl border border-border bg-place-bg text-muted-foreground hover:bg-muted transition-colors"
       >
         <RotateCcw className="w-3.5 h-3.5" />
-        초기화
       </button>
 
       {open && suggestions.length > 0 && (
-        <ul className="absolute top-full left-0 right-0 bg-white border-x border-b border-border rounded-b-xl shadow-md z-50 overflow-hidden">
+        <ul className="absolute top-full left-0 right-0 bg-place-bg border-x border-b border-border rounded-b-xl shadow-md z-50 overflow-hidden">
           {suggestions.map((s) => (
             <li key={s.placeId}>
               <button
