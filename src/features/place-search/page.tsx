@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { DUMMY_AUTOCOMPLETE_SUGGESTIONS, DUMMY_PLACES } from './constants/dummy-places';
-import { FooterNav } from './components/FooterNav';
+import { FooterNav } from '@/components/FooterNav';
 import { FullMap } from './components/FullMap';
 import { MapPreview } from './components/MapPreview';
 import { PlaceList } from './components/PlaceList';
