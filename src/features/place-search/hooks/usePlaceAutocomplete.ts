@@ -9,11 +9,11 @@ export interface AutocompleteSuggestion {
   secondaryText: string;
 }
 
-export function usePlaceAutocomplete(input: string) {
+export function usePlaceAutocomplete(input: string, disabled = false) {
   const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
 
   useEffect(() => {
-    if (input.length < 2) {
+    if (disabled || input.length < 2) {
       setSuggestions([]);
       return;
     }
@@ -26,7 +26,7 @@ export function usePlaceAutocomplete(input: string) {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [input]);
+  }, [input, disabled]);
 
   return suggestions;
 }

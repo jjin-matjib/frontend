@@ -13,6 +13,7 @@ import { SearchBar } from './components/SearchBar';
 import { ViewToggle } from './components/ViewToggle';
 import { usePlaces } from './hooks/usePlaces';
 import { useViewTab } from './hooks/useViewTab';
+import { toMarkers } from './utils/map';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -28,7 +29,7 @@ export function PlaceSearchPage() {
   }, [query]);
 
   const hasResults = query !== null;
-  const markers = allPlaces.map((p) => ({ id: p.id, lat: p.lat, lng: p.lng }));
+  const markers = toMarkers(allPlaces);
 
   return (
     <main className="relative flex flex-col h-dvh bg-place-bg w-full">
@@ -63,7 +64,7 @@ export function PlaceSearchPage() {
             {tab === 'list' ? (
               <>
                 <div className="shrink-0">
-                  <MapPreview markers={places.map((p) => ({ id: p.id, lat: p.lat, lng: p.lng }))} />
+                  <MapPreview markers={toMarkers(places)} />
                 </div>
                 <div ref={scrollRef} className="flex-1 overflow-y-auto">
                   {loading ? (

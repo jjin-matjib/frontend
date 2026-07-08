@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DUMMY_PLACES } from '../constants/dummy-places';
 import type { Place } from '../types';
 import { usePlaceSearch } from './usePlaceSearch';
@@ -27,7 +27,7 @@ export function usePlaces(query: string | null, useMock: boolean) {
 
   const places = allPlaces.slice(0, page * PAGE_SIZE);
   const hasMore = places.length < allPlaces.length;
-  const loadMore = () => setPage((p) => p + 1);
+  const loadMore = useCallback(() => setPage((p) => p + 1), []);
 
   return { places, allPlaces, hasMore, loadMore, loading, error };
 }

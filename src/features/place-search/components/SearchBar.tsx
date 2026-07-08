@@ -14,7 +14,7 @@ export function SearchBar({ mockSuggestions }: Props) {
   const [query, setQuery] = useQueryState('q');
   const [input, setInput] = useState(query ?? '');
   const [open, setOpen] = useState(false);
-  const apiSuggestions = usePlaceAutocomplete(mockSuggestions ? '' : input);
+  const apiSuggestions = usePlaceAutocomplete(input, !!mockSuggestions);
   const suggestions = mockSuggestions
     ? mockSuggestions.filter((s) =>
         s.mainText.toLowerCase().includes(input.toLowerCase()),
