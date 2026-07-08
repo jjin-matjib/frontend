@@ -37,7 +37,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ suggestions: [] });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const suggestions = (data.suggestions ?? [])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .filter((s: any) => s.placePrediction)

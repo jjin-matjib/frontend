@@ -20,11 +20,9 @@ function MarkerInfoCard({ place, onClose }: { place: Place; onClose: () => void 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
             <span className="text-xs text-muted-foreground">{place.category}</span>
-            {place.isOpen !== undefined && (
-              <span className={`text-xs font-medium ${place.isOpen ? 'text-emerald-600' : 'text-destructive'}`}>
-                {place.isOpen ? '영업 중' : '영업 종료'}
-              </span>
-            )}
+            <span className={`text-xs font-medium ${place.isOpen ? 'text-place-open' : 'text-destructive'}`}>
+              {place.isOpen ? '영업 중' : '영업 종료'}
+            </span>
           </div>
           <p className="font-semibold text-foreground text-sm truncate">{place.name}</p>
           <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">

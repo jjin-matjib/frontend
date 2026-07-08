@@ -13,10 +13,7 @@ export function usePlaceAutocomplete(input: string, disabled = false) {
   const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
 
   useEffect(() => {
-    if (disabled || input.length < 2) {
-      setSuggestions([]);
-      return;
-    }
+    if (disabled || input.length < 2) return;
 
     const timer = setTimeout(() => {
       fetch(`/api/places/autocomplete?q=${encodeURIComponent(input)}`)
@@ -28,5 +25,5 @@ export function usePlaceAutocomplete(input: string, disabled = false) {
     return () => clearTimeout(timer);
   }, [input, disabled]);
 
-  return suggestions;
+  return disabled || input.length < 2 ? [] : suggestions;
 }
