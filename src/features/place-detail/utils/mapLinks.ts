@@ -5,8 +5,8 @@ interface MapLinkPlace {
   lng: number;
 }
 
-export function getKakaoMapUrl({ name, lat, lng }: MapLinkPlace) {
-  return `https://map.kakao.com/link/map/${encodeURIComponent(name)},${lat},${lng}`;
+export function getKakaoMapUrl({ lat, lng }: MapLinkPlace) {
+  return `kakaomap://look?p=${lat},${lng}`;
 }
 
 export function getNaverMapUrl({ name }: MapLinkPlace) {
