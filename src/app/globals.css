@@ -202,4 +202,22 @@
       display: none;
     }
   }
+
+  .scrollbar-place {
+    scrollbar-width: thin;
+    scrollbar-color: var(--place-divider) transparent;
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--place-divider);
+      border-radius: 9999px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--place-shadow);
+    }
+  }
 }

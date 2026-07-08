@@ -79,7 +79,7 @@ export function PlaceSearchPage() {
                 <div className="shrink-0">
                   <MapPreview markers={toMarkers(places)} />
                 </div>
-                <div ref={scrollRef} className="flex-1 overflow-y-auto">
+                <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-place">
                   {loading ? (
                     <p className="text-center text-sm text-muted-foreground py-10">검색 중...</p>
                   ) : error ? (
