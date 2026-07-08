@@ -28,13 +28,13 @@ export function PlaceInfoSection({ place }: Props) {
       </div>
 
       <dl className="flex gap-4 rounded-xl border p-4 text-sm leading-5">
-        <div className="flex flex-1 flex-col gap-4">
+        <div className="flex flex-[4] flex-col gap-4">
           <div className="flex gap-3">
             <dt className="shrink-0">
               <Clock className="mt-0.5 size-4 text-muted-foreground" />
               <span className="sr-only">영업시간</span>
             </dt>
-            <dd className="flex flex-col gap-1">
+            <dd className="flex flex-col gap-1 whitespace-nowrap">
               <span
                 className={cn(
                   "font-medium",
@@ -87,7 +87,7 @@ export function PlaceInfoSection({ place }: Props) {
         </div>
 
         {place.photoName && (
-          <div className="relative h-28 w-28 shrink-0 self-start overflow-hidden rounded-lg">
+          <div className="relative h-28 flex-[3] self-start overflow-hidden rounded-lg">
             <Image
               src={`/api/places/photo?name=${encodeURIComponent(place.photoName)}&maxWidthPx=300`}
               alt={place.name}
