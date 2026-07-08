@@ -1,0 +1,1 @@
+export { RegionRecommendPage } from "./page";
