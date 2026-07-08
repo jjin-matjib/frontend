@@ -131,8 +131,7 @@ export async function GET(req: NextRequest) {
 
   const places = (data.places ?? [])
     .map(mapPlace)
-    .sort((a: { rating: number }, b: { rating: number }) => b.rating - a.rating)
-    .slice(0, 10);
+    .sort((a: { rating: number }, b: { rating: number }) => b.rating - a.rating);
 
   return NextResponse.json({ places });
 }

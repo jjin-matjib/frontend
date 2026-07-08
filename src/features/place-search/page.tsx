@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { DUMMY_AUTOCOMPLETE_SUGGESTIONS, DUMMY_PLACES } from './constants/dummy-places';
@@ -20,10 +20,18 @@ export function PlaceSearchPage() {
   const [tab, setTab] = useViewTab();
   const [query] = useQueryState('q');
   const [useMock, setUseMock] = useState(true);
+  const [page, setPage] = useState(1);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setPage(1);
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [query]);
 
   const hasResults = query !== null;
   const { places: apiPlaces, loading, error } = usePlaceSearch(useMock ? null : query);
-  const places = useMock
+
+  const allPlaces = useMock
     ? query
       ? DUMMY_PLACES.filter((p) =>
           [p.name, p.category, ...p.tags].some((t) =>
@@ -32,7 +40,11 @@ export function PlaceSearchPage() {
         )
       : DUMMY_PLACES
     : apiPlaces;
-  const markers = places.map((p) => ({ id: p.id, lat: p.lat, lng: p.lng }));
+
+  const places = allPlaces.slice(0, page * 10);
+  const hasMore = places.length < allPlaces.length;
+  const loadMore = () => setPage((p) => p + 1);
+  const markers = allPlaces.map((p) => ({ id: p.id, lat: p.lat, lng: p.lng }));
 
   return (
     <main className="relative flex flex-col h-dvh bg-place-bg w-full">
@@ -69,15 +81,15 @@ export function PlaceSearchPage() {
             {tab === 'list' ? (
               <>
                 <div className="shrink-0">
-                  <MapPreview markers={markers} />
+                  <MapPreview markers={places.map((p) => ({ id: p.id, lat: p.lat, lng: p.lng }))} />
                 </div>
-                <div className="flex-1 overflow-y-auto">
+                <div ref={scrollRef} className="flex-1 overflow-y-auto">
                   {loading ? (
                     <p className="text-center text-sm text-muted-foreground py-10">검색 중...</p>
                   ) : error ? (
                     <p className="text-center text-sm text-destructive py-10">{error}</p>
                   ) : places.length > 0 ? (
-                    <PlaceList places={places} />
+                    <PlaceList places={places} hasMore={hasMore} onLoadMore={loadMore} loading={loading} />
                   ) : (
                     <p className="text-center text-sm text-muted-foreground py-10">검색 결과가 없습니다.</p>
                   )}
@@ -85,7 +97,7 @@ export function PlaceSearchPage() {
               </>
             ) : (
               <div className="flex-1 overflow-hidden p-3">
-                <FullMap markers={markers} places={places} />
+                <FullMap markers={markers} places={allPlaces} />
               </div>
             )}
           </>
