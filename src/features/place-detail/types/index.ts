@@ -11,4 +11,5 @@ export interface PlaceDetail {
   reviewCount: number;
   lat: number;
   lng: number;
+  photoName: string | null;
 }

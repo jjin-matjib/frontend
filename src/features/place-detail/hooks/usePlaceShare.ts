@@ -32,7 +32,52 @@ function drawRoundedRect(
   ctx.roundRect(x, y, width, height, radius);
 }
 
-function drawShareCard(place: PlaceDetail): HTMLCanvasElement {
+const ICON_SIZE = 16;
+const ICON_TEXT_GAP = 12;
+
+function iconDataUrl(pathMarkup: string) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${COLOR_MUTED_FOREGROUND}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${pathMarkup}</svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+// lucide-react의 Clock/Phone/MapPin과 동일한 path (PlaceInfoSection에서 쓰는 아이콘)
+const ICON_CLOCK = iconDataUrl('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>');
+const ICON_PHONE = iconDataUrl(
+  '<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>',
+);
+const ICON_MAP_PIN = iconDataUrl(
+  '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+);
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("이미지를 불러오지 못했습니다."));
+    img.src = src;
+  });
+}
+
+// PlaceInfoSection의 대표 사진(w-28/h-28, object-cover)과 동일한 크기·크롭 방식
+const PHOTO_SIZE = 112;
+const PHOTO_GAP = 16;
+
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  x: number,
+  y: number,
+  size: number,
+) {
+  const ratio = img.width / img.height;
+  const [sw, sh] =
+    ratio > 1 ? [img.height, img.height] : [img.width, img.width];
+  const sx = (img.width - sw) / 2;
+  const sy = (img.height - sh) / 2;
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, size, size);
+}
+
+async function drawShareCard(place: PlaceDetail): Promise<HTMLCanvasElement> {
   const canvas = document.createElement("canvas");
   canvas.width = CARD_WIDTH * CARD_SCALE;
   canvas.height = CARD_HEIGHT * CARD_SCALE;
@@ -84,14 +129,28 @@ function drawShareCard(place: PlaceDetail): HTMLCanvasElement {
   );
 
   // 정보 박스 (PlaceInfoSection의 영업시간/전화번호/주소 dl과 동일한 내용)
+  const [clockIcon, phoneIcon, mapPinIcon, photoIcon] = await Promise.all([
+    loadImage(ICON_CLOCK),
+    loadImage(ICON_PHONE),
+    loadImage(ICON_MAP_PIN),
+    place.photoName
+      ? loadImage(`/api/places/photo?name=${encodeURIComponent(place.photoName)}&maxWidthPx=300`).catch(
+          () => null,
+        )
+      : Promise.resolve(null),
+  ]);
+
   const todayHours = getTodayHours(place.weekdayHours);
   const lineHeight = 26;
   const sectionGap = 14;
   const boxPad = 24;
-  const contentMaxWidth = CARD_WIDTH - CARD_PAD_X * 2 - boxPad * 2;
+  const textIndent = ICON_SIZE + ICON_TEXT_GAP;
+  const photoReserve = photoIcon ? PHOTO_SIZE + PHOTO_GAP : 0;
+  const contentMaxWidth = CARD_WIDTH - CARD_PAD_X * 2 - boxPad * 2 - textIndent - photoReserve;
 
-  const sections: { lines: string[]; color: (line: string) => string }[] = [
+  const sections: { icon: HTMLImageElement; lines: string[]; color: (line: string) => string }[] = [
     {
+      icon: clockIcon,
       lines: [place.isOpen ? "영업중" : "영업 종료", ...place.weekdayHours],
       color: (line) =>
         line === (place.isOpen ? "영업중" : "영업 종료")
@@ -102,8 +161,12 @@ function drawShareCard(place: PlaceDetail): HTMLCanvasElement {
             ? COLOR_FOREGROUND
             : COLOR_MUTED_FOREGROUND,
     },
-    ...(place.phone ? [{ lines: [place.phone], color: () => COLOR_FOREGROUND }] : []),
-    ...(place.address ? [{ lines: [place.address], color: () => COLOR_FOREGROUND }] : []),
+    ...(place.phone
+      ? [{ icon: phoneIcon, lines: [place.phone], color: () => COLOR_FOREGROUND }]
+      : []),
+    ...(place.address
+      ? [{ icon: mapPinIcon, lines: [place.address], color: () => COLOR_FOREGROUND }]
+      : []),
   ];
 
   const totalLines = sections.reduce((sum, s) => sum + s.lines.length, 0);
@@ -117,14 +180,26 @@ function drawShareCard(place: PlaceDetail): HTMLCanvasElement {
   drawRoundedRect(ctx, CARD_PAD_X, boxTop, boxWidth, boxHeight, 16);
   ctx.stroke();
 
+  if (photoIcon) {
+    const photoX = CARD_PAD_X + boxWidth - boxPad - PHOTO_SIZE;
+    const photoY = boxTop + boxPad;
+    ctx.save();
+    drawRoundedRect(ctx, photoX, photoY, PHOTO_SIZE, PHOTO_SIZE, 8);
+    ctx.clip();
+    drawImageCover(ctx, photoIcon, photoX, photoY, PHOTO_SIZE);
+    ctx.restore();
+  }
+
+  const textX = CARD_PAD_X + boxPad + textIndent;
   let textY = boxTop + boxPad + lineHeight * 0.7;
   ctx.font = `400 17px ${CARD_FONT}`;
   sections.forEach((section, sectionIndex) => {
+    ctx.drawImage(section.icon, CARD_PAD_X + boxPad, textY - ICON_SIZE + 4, ICON_SIZE, ICON_SIZE);
     section.lines.forEach((line, lineIndex) => {
       ctx.font =
         sectionIndex === 0 && lineIndex === 0 ? `500 17px ${CARD_FONT}` : `400 17px ${CARD_FONT}`;
       ctx.fillStyle = section.color(line);
-      ctx.fillText(line, CARD_PAD_X + boxPad, textY, contentMaxWidth);
+      ctx.fillText(line, textX, textY, contentMaxWidth);
       textY += lineHeight;
     });
     if (sectionIndex < sections.length - 1) textY += sectionGap;

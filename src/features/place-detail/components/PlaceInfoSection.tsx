@@ -1,5 +1,6 @@
-import { Clock, MapPin, Phone, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Clock, MapPin, Phone, Star } from "lucide-react";
+import Image from "next/image";
 import type { PlaceDetail } from "../types";
 import { getTodayHours } from "../utils/openingHours";
 
@@ -26,50 +27,74 @@ export function PlaceInfoSection({ place }: Props) {
         </div>
       </div>
 
-      <dl className="flex flex-col gap-4 rounded-xl border p-4 text-sm leading-5">
-        <div className="flex gap-3">
-          <dt className="shrink-0">
-            <Clock className="mt-0.5 size-4 text-muted-foreground" />
-            <span className="sr-only">영업시간</span>
-          </dt>
-          <dd className="flex flex-col gap-1">
-            <span className={cn("font-medium", place.isOpen ? "text-success" : "text-destructive")}>
-              {place.isOpen ? "영업중" : "영업 종료"}
-            </span>
-            {place.weekdayHours.map((line) => (
+      <dl className="flex gap-4 rounded-xl border p-4 text-sm leading-5">
+        <div className="flex flex-1 flex-col gap-4">
+          <div className="flex gap-3">
+            <dt className="shrink-0">
+              <Clock className="mt-0.5 size-4 text-muted-foreground" />
+              <span className="sr-only">영업시간</span>
+            </dt>
+            <dd className="flex flex-col gap-1">
               <span
-                key={line}
                 className={cn(
-                  line === todayHours ? "font-medium text-foreground" : "text-muted-foreground",
+                  "font-medium",
+                  place.isOpen ? "text-success" : "text-destructive",
                 )}
               >
-                {line}
+                {place.isOpen ? "영업중" : "영업 종료"}
               </span>
-            ))}
-          </dd>
-        </div>
-
-        {place.phone && (
-          <div className="flex gap-3">
-            <dt className="shrink-0">
-              <Phone className="mt-0.5 size-4 text-muted-foreground" />
-              <span className="sr-only">전화번호</span>
-            </dt>
-            <dd>
-              <a href={`tel:${place.phone}`} className="underline-offset-4 hover:underline">
-                {place.phone}
-              </a>
+              {place.weekdayHours.map((line) => (
+                <span
+                  key={line}
+                  className={cn(
+                    line === todayHours
+                      ? "font-medium text-foreground"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  {line}
+                </span>
+              ))}
             </dd>
           </div>
-        )}
 
-        {place.address && (
-          <div className="flex gap-3">
-            <dt className="shrink-0">
-              <MapPin className="mt-0.5 size-4 text-muted-foreground" />
-              <span className="sr-only">주소</span>
-            </dt>
-            <dd>{place.address}</dd>
+          {place.phone && (
+            <div className="flex gap-3">
+              <dt className="shrink-0">
+                <Phone className="mt-0.5 size-4 text-muted-foreground" />
+                <span className="sr-only">전화번호</span>
+              </dt>
+              <dd>
+                <a
+                  href={`tel:${place.phone}`}
+                  className="underline-offset-4 hover:underline"
+                >
+                  {place.phone}
+                </a>
+              </dd>
+            </div>
+          )}
+
+          {place.address && (
+            <div className="flex gap-3">
+              <dt className="shrink-0">
+                <MapPin className="mt-0.5 size-4 text-muted-foreground" />
+                <span className="sr-only">주소</span>
+              </dt>
+              <dd>{place.address}</dd>
+            </div>
+          )}
+        </div>
+
+        {place.photoName && (
+          <div className="relative h-28 w-28 shrink-0 self-start overflow-hidden rounded-lg">
+            <Image
+              src={`/api/places/photo?name=${encodeURIComponent(place.photoName)}&maxWidthPx=300`}
+              alt={place.name}
+              fill
+              sizes="1500px"
+              className="object-cover"
+            />
           </div>
         )}
       </dl>
