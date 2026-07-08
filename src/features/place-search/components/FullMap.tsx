@@ -4,19 +4,13 @@ import { X } from 'lucide-react';
 import { useState } from 'react';
 import { GoogleMapWrapper } from '@/components/map';
 import type { MapMarker } from '@/types/map';
-import { DUMMY_CLUSTERS, DUMMY_MARKERS, MAP_CENTER, MAP_DEFAULT_ZOOM } from '../constants/dummy-markers';
+import { DUMMY_CLUSTERS, DUMMY_MARKERS, MAP_DEFAULT_ZOOM } from '../constants/dummy-markers';
 import type { Place } from '../types';
+import { calcCenter } from '../utils/map';
 
 interface Props {
   markers?: MapMarker[];
   places?: Place[];
-}
-
-function calcCenter(markers: MapMarker[]) {
-  if (!markers.length) return MAP_CENTER;
-  const lat = markers.reduce((s, m) => s + m.lat, 0) / markers.length;
-  const lng = markers.reduce((s, m) => s + m.lng, 0) / markers.length;
-  return { lat, lng };
 }
 
 function MarkerInfoCard({ place, onClose }: { place: Place; onClose: () => void }) {

@@ -38,19 +38,15 @@ export function PlaceCard({ place }: Props) {
 
   return (
     <div className="flex gap-3 bg-place-surface rounded-xl p-3 shadow-sm">
-      {/* Category icon */}
       <div className={`w-20 h-20 rounded-lg shrink-0 flex items-center justify-center ${bg}`}>
         <Icon className={`w-8 h-8 ${color}`} />
       </div>
 
-      {/* Info */}
       <div className="flex-1 min-w-0">
-        {/* Category chip */}
         <span className="inline-block text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground mb-1">
           {place.category}
         </span>
 
-        {/* Name */}
         <p className="font-semibold text-sm text-foreground truncate mb-1">{place.name}</p>
 
         <div className="flex items-center gap-1.5 mb-1">
@@ -72,7 +68,6 @@ export function PlaceCard({ place }: Props) {
         </div>
       </div>
 
-      {/* Distance */}
       <div className="flex flex-col items-end justify-between shrink-0">
         <ChevronRight className="w-4 h-4 text-muted-foreground" />
         <span className="text-xs text-muted-foreground">{place.distanceKm}km</span>

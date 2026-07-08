@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { useQueryState } from 'nuqs';
-import { DUMMY_AUTOCOMPLETE_SUGGESTIONS, DUMMY_PLACES } from './constants/dummy-places';
+import { DUMMY_AUTOCOMPLETE_SUGGESTIONS } from './constants/dummy-places';
 import { FooterNav } from '@/components/FooterNav';
 import { FullMap } from './components/FullMap';
 import { MapPreview } from './components/MapPreview';
@@ -11,7 +11,7 @@ import { PlaceList } from './components/PlaceList';
 import { ResultHeader } from './components/ResultHeader';
 import { SearchBar } from './components/SearchBar';
 import { ViewToggle } from './components/ViewToggle';
-import { usePlaceSearch } from './hooks/usePlaceSearch';
+import { usePlaces } from './hooks/usePlaces';
 import { useViewTab } from './hooks/useViewTab';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -20,30 +20,14 @@ export function PlaceSearchPage() {
   const [tab, setTab] = useViewTab();
   const [query] = useQueryState('q');
   const [useMock, setUseMock] = useState(true);
-  const [page, setPage] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { places, allPlaces, hasMore, loadMore, loading, error } = usePlaces(query, useMock);
 
   useEffect(() => {
-    setPage(1);
     scrollRef.current?.scrollTo({ top: 0 });
   }, [query]);
 
   const hasResults = query !== null;
-  const { places: apiPlaces, loading, error } = usePlaceSearch(useMock ? null : query);
-
-  const allPlaces = useMock
-    ? query
-      ? DUMMY_PLACES.filter((p) =>
-          [p.name, p.category, ...p.tags].some((t) =>
-            t.toLowerCase().includes(query.toLowerCase()),
-          ),
-        )
-      : DUMMY_PLACES
-    : apiPlaces;
-
-  const places = allPlaces.slice(0, page * 10);
-  const hasMore = places.length < allPlaces.length;
-  const loadMore = () => setPage((p) => p + 1);
   const markers = allPlaces.map((p) => ({ id: p.id, lat: p.lat, lng: p.lng }));
 
   return (
@@ -66,10 +50,8 @@ export function PlaceSearchPage() {
         )}
       </div>
 
-      {/* 검색 입력 영역 */}
       <SearchBar mockSuggestions={useMock ? DUMMY_AUTOCOMPLETE_SUGGESTIONS : undefined} />
 
-      {/* 콘텐츠 영역 */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {hasResults ? (
           <>
@@ -113,7 +95,6 @@ export function PlaceSearchPage() {
         )}
       </div>
 
-      {/* 하단 네비게이션 */}
       <FooterNav />
 
       {/* 최근 본 장소 플로팅 버튼 placeholder — 별도 담당자 구현 예정 */}

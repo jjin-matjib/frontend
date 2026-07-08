@@ -1,16 +1,10 @@
 import { GoogleMapWrapper } from '@/components/map';
 import type { MapMarker } from '@/types/map';
-import { DUMMY_CLUSTERS, DUMMY_MARKERS, MAP_CENTER, MAP_DEFAULT_ZOOM } from '../constants/dummy-markers';
+import { DUMMY_CLUSTERS, DUMMY_MARKERS, MAP_DEFAULT_ZOOM } from '../constants/dummy-markers';
+import { calcCenter } from '../utils/map';
 
 interface Props {
   markers?: MapMarker[];
-}
-
-function calcCenter(markers: MapMarker[]) {
-  if (!markers.length) return MAP_CENTER;
-  const lat = markers.reduce((s, m) => s + m.lat, 0) / markers.length;
-  const lng = markers.reduce((s, m) => s + m.lng, 0) / markers.length;
-  return { lat, lng };
 }
 
 export function MapPreview({ markers }: Props) {
