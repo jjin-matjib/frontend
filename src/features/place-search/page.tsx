@@ -28,6 +28,19 @@ export function PlaceSearchPage() {
     scrollRef.current?.scrollTo({ top: 0 });
   }, [query]);
 
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || !hasMore) return;
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      if (scrollHeight - scrollTop - clientHeight < 200) {
+        loadMore();
+      }
+    };
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadMore]);
+
   const hasResults = query !== null;
   const markers = toMarkers(allPlaces);
 
@@ -72,7 +85,7 @@ export function PlaceSearchPage() {
                   ) : error ? (
                     <p className="text-center text-sm text-destructive py-10">{error}</p>
                   ) : places.length > 0 ? (
-                    <PlaceList places={places} hasMore={hasMore} onLoadMore={loadMore} loading={loading} />
+                    <PlaceList places={places} loading={loading} />
                   ) : (
                     <p className="text-center text-sm text-muted-foreground py-10">검색 결과가 없습니다.</p>
                   )}

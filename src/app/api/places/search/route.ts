@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
       locationBias: {
         circle: { center: SEOUL, radius: 20000 },
       },
-      pageSize: 20,
+      pageSize: 30,
     }),
   });
 

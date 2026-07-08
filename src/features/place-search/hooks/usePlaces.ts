@@ -1,19 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { DUMMY_PLACES } from '../constants/dummy-places';
 import type { Place } from '../types';
 import { usePlaceSearch } from './usePlaceSearch';
 
 const PAGE_SIZE = 10;
+const MAX_API_RESULTS = 30;
 
 export function usePlaces(query: string | null, useMock: boolean) {
   const [page, setPage] = useState(1);
+  const [trackedQuery, setTrackedQuery] = useState(query);
   const { places: apiPlaces, loading, error } = usePlaceSearch(useMock ? null : query);
 
-  useEffect(() => {
+  if (query !== trackedQuery) {
+    setTrackedQuery(query);
     setPage(1);
-  }, [query]);
+  }
 
   const allPlaces: Place[] = useMock
     ? query
@@ -23,7 +26,7 @@ export function usePlaces(query: string | null, useMock: boolean) {
           ),
         )
       : DUMMY_PLACES
-    : apiPlaces;
+    : apiPlaces.slice(0, MAX_API_RESULTS);
 
   const places = allPlaces.slice(0, page * PAGE_SIZE);
   const hasMore = places.length < allPlaces.length;
