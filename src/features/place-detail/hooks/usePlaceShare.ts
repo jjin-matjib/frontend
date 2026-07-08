@@ -112,7 +112,5 @@ export function usePlaceShare(place: PlaceDetail | undefined) {
     }
   };
 
-  const resetResult = () => setResult("idle");
-
-  return { shareImage, shareUrl, result, resetResult };
+  return { shareImage, shareUrl, result };
 }
