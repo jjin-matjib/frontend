@@ -87,10 +87,10 @@ export function PlaceSearchPage() {
         ) : (
           <>
             <div className="shrink-0">
-              <ViewToggle tab={tab} onTabChange={setTab} />
+              <ViewToggle tab={tab} onTabChange={setTab} listDisabled />
             </div>
             <div className="flex-1 overflow-hidden p-3">
-              <FullMap />
+              <FullMap markers={[]} />
             </div>
           </>
         )}
