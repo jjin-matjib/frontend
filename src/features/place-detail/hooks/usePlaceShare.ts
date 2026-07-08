@@ -162,11 +162,12 @@ export function usePlaceShare(place: PlaceDetail | undefined) {
     if (!place) return;
     setResult("idle");
     try {
-      const blob = await canvasToBlob(drawShareCard(place));
+      const blob = await canvasToBlob(await drawShareCard(place));
       const fileName = `${place.name.replace(/[\\/:*?"<>|]/g, "").trim() || "place"}.png`;
       const file = new File([blob], fileName, { type: "image/png" });
+      const url = window.location.href;
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: place.name });
+        await navigator.share({ files: [file], text: `${place.name}\n${url}` });
       } else {
         downloadBlob(blob, fileName);
         setResult("downloaded");
