@@ -52,9 +52,6 @@ export function SearchBar({ mockSuggestions }: Props) {
             if (e.key === 'Enter') submit(input);
             if (e.key === 'Escape') setOpen(false);
           }}
-          onFocus={() => {
-            if (suggestions.length > 0) setOpen(true);
-          }}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           placeholder="가게명, 지역, 지하철역 검색"
           className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0"

@@ -1,28 +1,57 @@
-import { ChevronRight, Star } from 'lucide-react';
+import {
+  ChevronRight,
+  Coffee,
+  Croissant,
+  Star,
+  Store,
+  Utensils,
+  Wine,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { Place } from '../types';
+
+interface CategoryConfig {
+  icon: LucideIcon;
+  bg: string;
+  color: string;
+}
+
+function getCategoryConfig(category: string): CategoryConfig {
+  const bg = 'bg-place-primary/10';
+  if (category.includes('카페') || category.includes('커피') || category.includes('찻집') || category.includes('차'))
+    return { icon: Coffee, bg, color: 'text-amber-600' };
+  if (category.includes('베이커리') || category.includes('패스트리') || category.includes('디저트'))
+    return { icon: Croissant, bg, color: 'text-orange-500' };
+  if (category.includes('브런치') || category.includes('레스토랑'))
+    return { icon: Utensils, bg, color: 'text-teal-600' };
+  if (category.includes('바') || category.includes('와인'))
+    return { icon: Wine, bg, color: 'text-violet-500' };
+  return { icon: Store, bg, color: 'text-muted-foreground' };
+}
 
 interface Props {
   place: Place;
 }
 
 export function PlaceCard({ place }: Props) {
+  const { icon: Icon, bg, color } = getCategoryConfig(place.category);
+
   return (
     <div className="flex gap-3 bg-place-surface rounded-xl p-3 shadow-sm">
-      {/* Thumbnail */}
-      <div className="w-20 h-20 rounded-lg bg-muted shrink-0 overflow-hidden">
-        <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-xs">
-          {place.category}
-        </div>
+      {/* Category icon */}
+      <div className={`w-20 h-20 rounded-lg shrink-0 flex items-center justify-center ${bg}`}>
+        <Icon className={`w-8 h-8 ${color}`} />
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 mb-1">
-          <span className="font-semibold text-sm text-foreground truncate">{place.name}</span>
-          <span className="shrink-0 text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-            {place.category}
-          </span>
-        </div>
+        {/* Category chip */}
+        <span className="inline-block text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground mb-1">
+          {place.category}
+        </span>
+
+        {/* Name */}
+        <p className="font-semibold text-sm text-foreground truncate mb-1">{place.name}</p>
 
         <div className="flex items-center gap-1.5 mb-1">
           {place.isOpen && (
