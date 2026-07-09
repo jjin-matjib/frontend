@@ -2,7 +2,9 @@
 
 import { Collapsible } from "@base-ui/react/collapsible";
 import { ChevronDown, Clock, Scale } from "lucide-react";
+import { findStation } from "../constants/stations";
 import type { RankedZone } from "../types";
+import { LineBadges } from "./LineBadges";
 
 interface Props {
   zone: RankedZone;
@@ -10,6 +12,9 @@ interface Props {
 }
 
 export function RecommendResultCard({ zone, participantCount }: Props) {
+  // 추천 권역이 우리 역 데이터에 있으면 노선 배지를 함께 보여준다.
+  const station = findStation(zone.name);
+
   return (
     <section className="flex flex-col gap-4 px-4">
       <div className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
@@ -18,7 +23,10 @@ export function RecommendResultCard({ zone, participantCount }: Props) {
         </span>
 
         <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-bold">{zone.name} 주변</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold">{zone.name} 주변</h2>
+            {station && <LineBadges lines={station.lines} />}
+          </div>
           <p className="text-sm text-muted-foreground">
             선택한 {participantCount}명이 가장 비슷하게 이동할 수 있는 곳이에요!
           </p>

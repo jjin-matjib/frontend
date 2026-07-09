@@ -8,6 +8,7 @@ import {
   STATION_OPTIONS,
   type StationOption,
 } from "../constants/stations";
+import { LineBadges } from "./LineBadges";
 
 interface Props {
   value: string | null;
@@ -55,7 +56,10 @@ export function StationSelect({ value, onChange, invalid }: Props) {
                   value={option}
                   className="flex cursor-default items-center justify-between gap-2 rounded-md px-3 py-2 outline-none data-[highlighted]:bg-muted"
                 >
-                  {option.label}
+                  <span className="flex min-w-0 items-center gap-2">
+                    <LineBadges lines={option.lines} />
+                    <span className="truncate">{option.label}</span>
+                  </span>
                   <Combobox.ItemIndicator>
                     <Check className="size-4 text-primary" />
                   </Combobox.ItemIndicator>
