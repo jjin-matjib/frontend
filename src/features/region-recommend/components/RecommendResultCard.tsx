@@ -29,7 +29,7 @@ export function RecommendResultCard({ zone, participantCount }: Props) {
             <Clock className="size-4" />평균 {zone.weightedMeanMinutes}분
           </span>
           <span className="inline-flex items-center gap-1">
-            <Utensils className="size-4" />맛집 {zone.restaurantCount}곳
+            <Utensils className="size-4" />맛집 {zone.goodRestaurantCount}곳
           </span>
         </div>
 

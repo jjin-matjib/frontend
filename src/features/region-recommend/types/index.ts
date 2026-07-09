@@ -49,8 +49,8 @@ export interface RankedZone {
   name: string;
   lat: number;
   lng: number;
-  /** 후보 반경 내 맛집 수 (밀집도 지표) */
-  restaurantCount: number;
+  /** 후보 반경 내 "좋은 식당" 수 (품질 기반 맛집 밀집도 지표) */
+  goodRestaurantCount: number;
   /** 인원 가중 평균 이동시간(분) — 낮을수록 좋음, 1순위 */
   weightedMeanMinutes: number;
   /** 이동시간 편차(분) = 최대-최소 — 낮을수록 형평성 좋음, 2순위 */

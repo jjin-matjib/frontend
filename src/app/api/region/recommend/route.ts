@@ -4,16 +4,23 @@ import {
   MAX_CANDIDATES,
   MAX_MATRIX_DESTINATIONS,
   RESTAURANT_DENSITY_RADIUS_M,
+  RESTAURANT_SAMPLE_SIZE,
 } from "@/features/region-recommend/constants/config";
 import type {
   OriginTravel,
   RecommendInput,
   RecommendOrigin,
+  Restaurant,
 } from "@/features/region-recommend/types";
 import {
+  haversine,
   prefilterByHaversine,
   weightedCentroid,
 } from "@/features/region-recommend/utils/geo";
+import {
+  countGoodRestaurants,
+  sortByBayesian,
+} from "@/features/region-recommend/utils/quality";
 import {
   rankZones,
   type ScorableZone,
@@ -24,6 +31,16 @@ const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 const PLACES_NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby";
 const ROUTE_MATRIX_URL =
   "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix";
+
+// 평점·리뷰수까지 함께 받아 "좋은 식당 밀도"와 맛집 리스트를 추가 호출 없이 계산한다.
+const FIELD_MASK = [
+  "places.id",
+  "places.displayName",
+  "places.location",
+  "places.rating",
+  "places.userRatingCount",
+  "places.primaryTypeDisplayName",
+].join(",");
 
 interface Candidate {
   id: string;
@@ -41,13 +58,14 @@ function getReferer(req: NextRequest) {
   return `${proto}://${host}/`;
 }
 
-/** Places searchNearby 호출. type별 장소 목록을 좌표와 함께 돌려준다. */
+/** Places searchNearby 호출. */
 async function searchNearby(
   req: NextRequest,
   center: { lat: number; lng: number },
   includedType: string,
   radius: number,
   maxResultCount: number,
+  rankPreference: "DISTANCE" | "POPULARITY",
 ) {
   const res = await fetch(PLACES_NEARBY_URL, {
     method: "POST",
@@ -55,12 +73,12 @@ async function searchNearby(
       "Content-Type": "application/json",
       "X-Goog-Api-Key": API_KEY,
       Referer: getReferer(req),
-      "X-Goog-FieldMask": "places.id,places.displayName,places.location",
+      "X-Goog-FieldMask": FIELD_MASK,
     },
     body: JSON.stringify({
       includedTypes: [includedType],
       maxResultCount,
-      rankPreference: "DISTANCE",
+      rankPreference,
       languageCode: "ko",
       locationRestriction: {
         circle: {
@@ -125,6 +143,33 @@ async function computeTransitMinutes(
   return matrix;
 }
 
+/** 후보 역 주변 인기 식당 표본을 Restaurant[]로 변환한다. */
+async function fetchRestaurants(
+  req: NextRequest,
+  zone: Candidate,
+): Promise<Restaurant[]> {
+  const places = await searchNearby(
+    req,
+    zone,
+    "restaurant",
+    RESTAURANT_DENSITY_RADIUS_M,
+    RESTAURANT_SAMPLE_SIZE,
+    "POPULARITY",
+  );
+  return places.map((p) => {
+    const lat = p.location?.latitude ?? 0;
+    const lng = p.location?.longitude ?? 0;
+    return {
+      id: p.id ?? "",
+      name: p.displayName?.text ?? "",
+      category: p.primaryTypeDisplayName?.text ?? "음식점",
+      rating: p.rating ?? 0,
+      reviewCount: p.userRatingCount ?? 0,
+      distanceM: Math.round(haversine(zone, { lat, lng }) * 1000),
+    };
+  });
+}
+
 export async function POST(req: NextRequest) {
   if (!API_KEY) {
     return NextResponse.json({ error: "API key missing" }, { status: 500 });
@@ -154,6 +199,7 @@ export async function POST(req: NextRequest) {
       "subway_station",
       CANDIDATE_SEARCH_RADIUS_M,
       MAX_CANDIDATES,
+      "DISTANCE",
     );
     const candidates: Candidate[] = nearby.map((p) => ({
       id: p.id,
@@ -175,17 +221,13 @@ export async function POST(req: NextRequest) {
       MAX_MATRIX_DESTINATIONS,
     );
 
-    // 3. 실제 이동시간(단일 배치) + 후보별 맛집 밀집도
+    // 3. 실제 이동시간(단일 배치) + 후보별 식당 표본(평점·리뷰수 포함)
     const minutes = await computeTransitMinutes(req, origins, survivors);
-    const restaurantCounts = await Promise.all(
-      survivors.map((s) =>
-        searchNearby(req, s, "restaurant", RESTAURANT_DENSITY_RADIUS_M, 20).then(
-          (list) => list.length,
-        ),
-      ),
+    const restaurantsByZone = await Promise.all(
+      survivors.map((zone) => fetchRestaurants(req, zone)),
     );
 
-    // 4. 채점·랭킹
+    // 4. 채점·랭킹 — 밀집도는 "식당 개수"가 아니라 "좋은 식당 수"
     const scorable: ScorableZone[] = survivors.map((zone, di) => {
       const perOrigin: OriginTravel[] = origins.map((origin, oi) => ({
         stationId: origin.stationId,
@@ -198,14 +240,20 @@ export async function POST(req: NextRequest) {
         name: zone.name,
         lat: zone.lat,
         lng: zone.lng,
-        restaurantCount: restaurantCounts[di],
+        goodRestaurantCount: countGoodRestaurants(restaurantsByZone[di]),
         perOrigin,
       };
     });
 
     const ranked = rankZones(scorable);
+    const recommendedIndex = survivors.findIndex((z) => z.id === ranked[0].id);
+
     return NextResponse.json({
-      result: { recommended: ranked[0], candidates: ranked },
+      result: {
+        recommended: ranked[0],
+        candidates: ranked,
+        restaurants: sortByBayesian(restaurantsByZone[recommendedIndex] ?? []),
+      },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "추천에 실패했습니다.";

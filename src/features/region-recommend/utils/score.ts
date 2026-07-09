@@ -1,4 +1,4 @@
-import { RESTAURANT_DENSITY_CAP, SCORE_WEIGHTS } from "../constants/config";
+import { GOOD_RESTAURANT_CAP, SCORE_WEIGHTS } from "../constants/config";
 import type { OriginTravel, RankedZone } from "../types";
 
 /** 채점 전 후보. perOrigin에 이동시간이 채워져 있어야 한다. */
@@ -7,7 +7,7 @@ export interface ScorableZone {
   name: string;
   lat: number;
   lng: number;
-  restaurantCount: number;
+  goodRestaurantCount: number;
   perOrigin: OriginTravel[];
 }
 
@@ -46,7 +46,7 @@ export function rankZones(zones: ScorableZone[]): RankedZone[] {
   const normSpreads = normalize(spreads);
 
   const ranked = zones.map((zone, i) => {
-    const density = Math.min(zone.restaurantCount / RESTAURANT_DENSITY_CAP, 1);
+    const density = Math.min(zone.goodRestaurantCount / GOOD_RESTAURANT_CAP, 1);
     const score =
       SCORE_WEIGHTS.mean * normMeans[i] +
       SCORE_WEIGHTS.spread * normSpreads[i] -
@@ -56,7 +56,7 @@ export function rankZones(zones: ScorableZone[]): RankedZone[] {
       name: zone.name,
       lat: zone.lat,
       lng: zone.lng,
-      restaurantCount: zone.restaurantCount,
+      goodRestaurantCount: zone.goodRestaurantCount,
       weightedMeanMinutes: Math.round(means[i]),
       spreadMinutes: Math.round(spreads[i]),
       score,
