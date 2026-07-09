@@ -246,6 +246,12 @@ export async function POST(req: NextRequest) {
     });
 
     const ranked = rankZones(scorable);
+    if (ranked.length === 0) {
+      return NextResponse.json(
+        { error: "모든 출발지에서 갈 수 있는 권역을 찾지 못했습니다." },
+        { status: 404 },
+      );
+    }
     const recommendedIndex = survivors.findIndex((z) => z.id === ranked[0].id);
 
     return NextResponse.json({

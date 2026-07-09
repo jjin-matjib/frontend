@@ -25,7 +25,7 @@ export const RESTAURANT_SAMPLE_SIZE = 20;
 export const GOOD_RATING_MIN = 4.3;
 export const GOOD_REVIEW_MIN = 300;
 
-/** 좋은 식당 밀도 정규화 상한(이 수를 넘으면 1.0로 본다) */
+/** 밀집도 보너스를 계산할 때 인정하는 좋은 식당 수의 상한 */
 export const GOOD_RESTAURANT_CAP = 10;
 
 /**
@@ -39,13 +39,19 @@ export const BAYESIAN_PRIOR_RATING = 4.0;
 export const BAYESIAN_PRIOR_REVIEWS = 100;
 
 /**
- * 종합 점수 가중치. score = wMean·mean + wSpread·spread − wDensity·density (정규화 후).
- * "평균 이동시간 최소"가 1순위이므로 wMean을 크게 둔다.
+ * 종합 점수 가중치. 모든 항을 "분" 단위 절대값으로 더한다(낮을수록 좋음).
+ *
+ *   score(분) = 가중평균 이동시간 + α·이동시간 편차 − β·min(좋은 식당 수, CAP)
+ *
+ * 후보 집합 안에서 min-max 정규화하면 안 된다 — 후보가 몇 개 없을 때
+ * 평균 1분 차이가 0~1 전 범위로 늘어나, 편차 11분 차이를 눌러버린다.
+ * 절대값이라 해석도 된다: α=0.5 → "편차 1분은 평균 0.5분만큼 나쁘다".
  */
 export const SCORE_WEIGHTS = {
-  mean: 1,
-  spread: 0.35,
-  density: 0.25,
+  /** 편차 1분당 페널티(분) — 형평성 */
+  spreadPenaltyPerMinute: 0.5,
+  /** 좋은 식당 1곳당 보너스(분) */
+  densityBonusPerRestaurant: 0.3,
 } as const;
 
 /** React Query staleTime — 동일 입력 재요청 시 유료 호출을 막는다. */
