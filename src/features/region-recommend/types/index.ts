@@ -1,23 +1,3 @@
-import type { STATION_OPTIONS } from "../constants/stations";
-
-/** 선택 가능한 역 식별자 */
-export type StationId = (typeof STATION_OPTIONS)[number]["value"];
-
-/** 드롭다운에 노출되는 역 정보 */
-export interface Station {
-  id: StationId;
-  name: string;
-  lat: number;
-  lng: number;
-}
-
-/** 참여자 폼 한 행의 상태. 역 미선택 시 stationId는 null. */
-export interface Participant {
-  id: string;
-  label: string;
-  stationId: StationId | null;
-}
-
 /**
  * 서버로 보내는 출발 지점. 같은 역을 고른 참여자는 하나로 합쳐지고
  * weight(인원수)로 가중된다 — "인원 + 위치별 권역 산입".
