@@ -49,10 +49,13 @@ export function RegionRecommendPage() {
       {result && input && (
         <div className="flex flex-col gap-4">
           {data.mock && (
-            <p className="mx-4 rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
-              API 키가 없어 <strong>더미 데이터</strong>로 계산한 결과입니다.
-              `.env.local`에 키를 넣으면 실제 이동시간·맛집으로 바뀝니다.
-            </p>
+            <div className="px-4">
+              <p className="rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
+                API 키가 없어 <strong>더미 데이터</strong>로 계산한 결과입니다.
+                <code>.env.local</code>에 키를 넣으면 실제 이동시간·맛집으로
+                바뀝니다.
+              </p>
+            </div>
           )}
           <RecommendResultCard zone={result.recommended} />
           <RegionMap origins={input.origins} recommended={result.recommended} />

@@ -22,9 +22,9 @@ export function RestaurantList({ zoneName, restaurants }: Props) {
             key={restaurant.id}
             className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3"
           >
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{restaurant.name}</span>
+            <div className="flex min-w-0 flex-col gap-1">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="truncate font-medium">{restaurant.name}</span>
                 <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                   {restaurant.category}
                 </span>

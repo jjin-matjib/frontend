@@ -22,8 +22,6 @@ export const STATION_OPTIONS: StationOption[] = seoulStations.map((s) => ({
   lng: s.lng,
 }));
 
-export const STATION_VALUES = STATION_OPTIONS.map((o) => o.value);
-
 const STATION_BY_ID = new Map<string, StationOption>(
   STATION_OPTIONS.map((o) => [o.value, o]),
 );

@@ -4,16 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { findStation } from "../constants/stations";
+import { MAX_PARTICIPANTS, MIN_PARTICIPANTS } from "../constants/config";
 import {
   recommendFormSchema,
   type RecommendFormValues,
 } from "../schemas/participant";
-import type { RecommendInput, RecommendOrigin } from "../types";
+import type { RecommendInput } from "../types";
+import { toOrigins } from "../utils/origins";
 import { ParticipantRow } from "./ParticipantRow";
-
-const MIN_PARTICIPANTS = 2;
-const MAX_PARTICIPANTS = 6;
 
 /** 0 → "나", 1 → "친구 A", 2 → "친구 B" … */
 function participantLabel(index: number): string {
@@ -22,29 +20,6 @@ function participantLabel(index: number): string {
 
 function emptyRow() {
   return { id: crypto.randomUUID(), label: "", stationId: null };
-}
-
-/** 참여자들을 역 단위로 합쳐 인원 가중 출발지로 만든다. */
-function toOrigins(values: RecommendFormValues): RecommendInput {
-  const byStation = new Map<string, RecommendOrigin>();
-  for (const row of values.participants) {
-    if (!row.stationId) continue;
-    const station = findStation(row.stationId);
-    if (!station) continue;
-    const existing = byStation.get(station.value);
-    if (existing) {
-      existing.weight += 1;
-    } else {
-      byStation.set(station.value, {
-        stationId: station.value,
-        label: station.label,
-        lat: station.lat,
-        lng: station.lng,
-        weight: 1,
-      });
-    }
-  }
-  return { origins: [...byStation.values()] };
 }
 
 interface Props {
@@ -64,7 +39,9 @@ export function ParticipantForm({ isPending, onSubmit }: Props) {
     name: "participants",
   });
 
-  const submit = handleSubmit((values) => onSubmit(toOrigins(values)));
+  const submit = handleSubmit((values) =>
+    onSubmit(toOrigins(values.participants)),
+  );
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4 px-4">

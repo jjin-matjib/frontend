@@ -3,6 +3,10 @@
  * Places(Enterprise SKU)와 Routes API는 유료이므로 호출 수를 상한한다.
  */
 
+/** 참여자 수 범위 — 폼 UI와 zod 스키마가 함께 참조한다. */
+export const MIN_PARTICIPANTS = 2;
+export const MAX_PARTICIPANTS = 6;
+
 /** Places로 발굴하는 후보 권역(역) 최대 수 */
 export const MAX_CANDIDATES = 8;
 
@@ -27,8 +31,8 @@ export const RESTAURANT_DISPLAY_COUNT = 6;
  *   집합 평균으로 두면 평점이 높은 권역에서 저리뷰 고평점이 수축되지 않아 상수로 쓴다.
  * - priorReviews(m): 이 리뷰 수만큼의 "가상 평균 리뷰"를 섞는다.
  *
- * TODO(#region-recommend): C=4.0은 아직 실측 근거가 없는 값이다.
- * 실 API 키 확보 후 표본 평균 평점을 측정해 보정한다.
+ * C=4.0은 아직 실측 근거가 없는 잠정값이다. 실 API 키를 확보하면
+ * 표본의 평균 평점을 측정해 보정해야 한다(PR 리뷰 노트 참고).
  */
 export const BAYESIAN_PRIOR_RATING = 4.0;
 export const BAYESIAN_PRIOR_REVIEWS = 100;
