@@ -54,6 +54,38 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * 수도권 전철 노선색. 운영기관 공식 색상(위키백과 「틀:한국 철도 노선색」)이라
+ * 테마에 따라 바뀌지 않는 고정 브랜드 색이다. bg-line-* 유틸리티로 사용한다.
+ */
+@theme {
+  --color-line-1: #0052a4;
+  --color-line-2: #00a84d;
+  --color-line-3: #ef7c1c;
+  --color-line-4: #00a5de;
+  --color-line-5: #996cac;
+  --color-line-6: #cd7c2f;
+  --color-line-7: #747f00;
+  --color-line-8: #e6186c;
+  --color-line-9: #bdb092;
+  --color-line-suinbundang: #f5a200;
+  --color-line-sinbundang: #d4003b;
+  --color-line-gyeongui: #77c4a3;
+  --color-line-gyeongchun: #0c8e72;
+  --color-line-airport: #0090d2;
+  --color-line-uisinseol: #b0ce18;
+  --color-line-sillim: #6789ca;
+  --color-line-seohae: #81a914;
+  --color-line-gyeonggang: #003da5;
+  --color-line-gimpo: #a17800;
+  --color-line-incheon1: #7ca8d5;
+  --color-line-incheon2: #ed8b00;
+  --color-line-gtxa: #9a6292;
+  --color-line-uijeongbu: #fda600;
+  --color-line-everline: #509f22;
+  --color-line-unknown: #9ca3af;
+}
+
 :root {
   --background: #faf8f5;
   --foreground: oklch(0.145 0 0);
