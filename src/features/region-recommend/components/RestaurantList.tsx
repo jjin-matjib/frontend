@@ -1,4 +1,5 @@
 import { MapPin, Star } from "lucide-react";
+import { RESTAURANT_DISPLAY_COUNT } from "../constants/config";
 import type { Restaurant } from "../types";
 
 interface Props {
@@ -7,6 +8,8 @@ interface Props {
 }
 
 export function RestaurantList({ zoneName, restaurants }: Props) {
+  const visible = restaurants.slice(0, RESTAURANT_DISPLAY_COUNT);
+
   return (
     <section className="flex flex-col gap-3 px-4">
       <div className="flex items-baseline justify-between">
@@ -14,7 +17,7 @@ export function RestaurantList({ zoneName, restaurants }: Props) {
         <span className="text-xs text-muted-foreground">인기 상위 20곳 중 추천순</span>
       </div>
       <ul className="flex flex-col gap-2">
-        {restaurants.map((restaurant) => (
+        {visible.map((restaurant) => (
           <li
             key={restaurant.id}
             className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3"

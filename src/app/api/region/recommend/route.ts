@@ -18,7 +18,10 @@ import {
   weightedCentroid,
 } from "@/features/region-recommend/utils/geo";
 import { buildMockResult } from "@/features/region-recommend/utils/mockRecommend";
-import { sortByBayesian } from "@/features/region-recommend/utils/quality";
+import {
+  excludeUnrated,
+  sortByBayesian,
+} from "@/features/region-recommend/utils/quality";
 import {
   rankZones,
   type ScorableZone,
@@ -184,7 +187,7 @@ async function fetchRestaurants(
         }) * 1000,
       ),
     }));
-    return sortByBayesian(restaurants);
+    return sortByBayesian(excludeUnrated(restaurants));
   } catch (e) {
     const msg = e instanceof Error ? e.message : "unknown";
     console.error("[region/recommend] restaurants fetch failed:", msg);

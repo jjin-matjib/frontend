@@ -18,6 +18,9 @@ export const RESTAURANT_SEARCH_RADIUS_M = 500;
 /** 식당 표본 수(Places searchNearby 상한이 20) */
 export const RESTAURANT_SAMPLE_SIZE = 20;
 
+/** 화면에 노출하는 맛집 수 */
+export const RESTAURANT_DISPLAY_COUNT = 6;
+
 /**
  * 베이지안 평균의 사전분포.
  * - priorRating(C): "리뷰가 없으면 평범한 식당"이라고 가정하는 기준 평점.

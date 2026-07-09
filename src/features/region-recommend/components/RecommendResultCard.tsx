@@ -8,10 +8,9 @@ import { LineBadges } from "./LineBadges";
 
 interface Props {
   zone: RankedZone;
-  participantCount: number;
 }
 
-export function RecommendResultCard({ zone, participantCount }: Props) {
+export function RecommendResultCard({ zone }: Props) {
   // 추천 권역이 우리 역 데이터에 있으면 노선 배지를 함께 보여준다.
   const station = findStation(zone.name);
 
@@ -22,14 +21,9 @@ export function RecommendResultCard({ zone, participantCount }: Props) {
           추천 장소
         </span>
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold">{zone.name} 주변</h2>
-            {station && <LineBadges lines={station.lines} />}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            선택한 {participantCount}명이 가장 비슷하게 이동할 수 있는 곳이에요!
-          </p>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold">{zone.name} 주변</h2>
+          {station && <LineBadges lines={station.lines} />}
         </div>
 
         <div className="flex gap-4 text-sm text-muted-foreground">
@@ -60,12 +54,6 @@ export function RecommendResultCard({ zone, participantCount }: Props) {
                   <span className="font-medium">{origin.minutes}분</span>
                 </li>
               ))}
-              <li className="flex items-center justify-between border-t border-border pt-2 text-sm">
-                <span className="text-muted-foreground">
-                  가장 오래 걸리는 사람과의 차이
-                </span>
-                <span className="font-medium">{zone.spreadMinutes}분</span>
-              </li>
             </ul>
           </Collapsible.Panel>
         </Collapsible.Root>

@@ -26,6 +26,17 @@ export function bayesianScore(
   return (v / (v + m)) * rating + (m / (v + m)) * priorRating;
 }
 
+/**
+ * 평점이 없는 곳(리뷰 0)을 제외한다.
+ *
+ * Google은 평가가 없는 장소에 rating 필드를 아예 주지 않는다. 이를 0으로 채우면
+ * bayesianScore(0, 0)이 정확히 사전값 C(=4.0)가 되어, ★3.9에 리뷰 5,000개인
+ * 검증된 맛집(3.90)을 이겨버린다. 정렬 전에 걸러낸다.
+ */
+export function excludeUnrated(restaurants: Restaurant[]): Restaurant[] {
+  return restaurants.filter((r) => r.reviewCount > 0 && r.rating > 0);
+}
+
 /** 베이지안 평균 내림차순 정렬(동점이면 리뷰 많은 순). */
 export function sortByBayesian(restaurants: Restaurant[]): Restaurant[] {
   return [...restaurants].sort((a, b) => {

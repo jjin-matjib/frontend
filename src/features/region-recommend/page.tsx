@@ -19,8 +19,6 @@ export function RegionRecommendPage() {
     useRegionRecommendQuery(input);
 
   const submitted = input !== null;
-  const participantCount =
-    input?.origins.reduce((sum, origin) => sum + origin.weight, 0) ?? 0;
   const result = data?.result;
 
   return (
@@ -56,10 +54,7 @@ export function RegionRecommendPage() {
               `.env.local`에 키를 넣으면 실제 이동시간·맛집으로 바뀝니다.
             </p>
           )}
-          <RecommendResultCard
-            zone={result.recommended}
-            participantCount={participantCount}
-          />
+          <RecommendResultCard zone={result.recommended} />
           <RegionMap origins={input.origins} recommended={result.recommended} />
           {result.restaurants.length > 0 && (
             <RestaurantList

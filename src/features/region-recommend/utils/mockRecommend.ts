@@ -10,7 +10,7 @@ import type {
   Restaurant,
 } from "../types";
 import { haversine, prefilterByHaversine } from "./geo";
-import { sortByBayesian } from "./quality";
+import { excludeUnrated, sortByBayesian } from "./quality";
 import { rankZones, type ScorableZone } from "./score";
 
 function hashString(s: string): number {
@@ -82,6 +82,7 @@ export function buildMockResult(input: RecommendInput): RecommendResult {
   return {
     recommended: ranked[0],
     candidates: ranked,
-    restaurants: sortByBayesian(buildMockRestaurants(ranked[0].id)).slice(0, 6),
+    // 실 라우트와 동일하게 "정렬된 표본 전체"를 반환한다(노출 개수는 UI가 정한다).
+    restaurants: sortByBayesian(excludeUnrated(buildMockRestaurants(ranked[0].id))),
   };
 }
