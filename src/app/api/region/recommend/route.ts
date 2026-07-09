@@ -3,8 +3,8 @@ import {
   CANDIDATE_SEARCH_RADIUS_M,
   MAX_CANDIDATES,
   MAX_MATRIX_DESTINATIONS,
-  RESTAURANT_DENSITY_RADIUS_M,
   RESTAURANT_SAMPLE_SIZE,
+  RESTAURANT_SEARCH_RADIUS_M,
 } from "@/features/region-recommend/constants/config";
 import type {
   OriginTravel,
@@ -17,29 +17,41 @@ import {
   prefilterByHaversine,
   weightedCentroid,
 } from "@/features/region-recommend/utils/geo";
-import {
-  countGoodRestaurants,
-  sortByBayesian,
-} from "@/features/region-recommend/utils/quality";
+import { buildMockResult } from "@/features/region-recommend/utils/mockRecommend";
+import { sortByBayesian } from "@/features/region-recommend/utils/quality";
 import {
   rankZones,
   type ScorableZone,
 } from "@/features/region-recommend/utils/score";
 
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+/**
+ * 서버 전용 키를 우선 읽고, 팀 공용 변수명으로 폴백한다.
+ * 키가 없으면 Mock으로 응답하므로 `.env.local`에 키만 꽂으면 실 API로 전환된다.
+ */
+const API_KEY =
+  process.env.GOOGLE_MAPS_API_KEY ??
+  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ??
+  "";
 
 const PLACES_NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby";
 const ROUTE_MATRIX_URL =
   "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix";
 
-// 평점·리뷰수까지 함께 받아 "좋은 식당 밀도"와 맛집 리스트를 추가 호출 없이 계산한다.
-const FIELD_MASK = [
+/** 역 검색은 평점이 필요 없다 → Pro SKU(월 5,000 무료). */
+const STATION_FIELD_MASK = [
   "places.id",
   "places.displayName",
   "places.location",
+].join(",");
+
+/** 식당은 평점·리뷰수가 필요하다 → Enterprise SKU(월 1,000 무료). 우승 권역 1곳에만 쓴다. */
+const RESTAURANT_FIELD_MASK = [
+  "places.id",
+  "places.displayName",
+  "places.location",
+  "places.primaryTypeDisplayName",
   "places.rating",
   "places.userRatingCount",
-  "places.primaryTypeDisplayName",
 ].join(",");
 
 interface Candidate {
@@ -58,7 +70,7 @@ function getReferer(req: NextRequest) {
   return `${proto}://${host}/`;
 }
 
-/** Places searchNearby 호출. */
+/** Places searchNearby 호출. fieldMask가 과금 SKU를 결정하므로 호출부에서 최소한으로 넘긴다. */
 async function searchNearby(
   req: NextRequest,
   center: { lat: number; lng: number },
@@ -66,6 +78,7 @@ async function searchNearby(
   radius: number,
   maxResultCount: number,
   rankPreference: "DISTANCE" | "POPULARITY",
+  fieldMask: string,
 ) {
   const res = await fetch(PLACES_NEARBY_URL, {
     method: "POST",
@@ -73,7 +86,7 @@ async function searchNearby(
       "Content-Type": "application/json",
       "X-Goog-Api-Key": API_KEY,
       Referer: getReferer(req),
-      "X-Goog-FieldMask": FIELD_MASK,
+      "X-Goog-FieldMask": fieldMask,
     },
     body: JSON.stringify({
       includedTypes: [includedType],
@@ -143,38 +156,43 @@ async function computeTransitMinutes(
   return matrix;
 }
 
-/** 후보 역 주변 인기 식당 표본을 Restaurant[]로 변환한다. */
+/** 추천 권역 주변 인기 식당 표본(최대 20곳). 실패해도 추천 자체는 살린다. */
 async function fetchRestaurants(
   req: NextRequest,
   zone: Candidate,
 ): Promise<Restaurant[]> {
-  const places = await searchNearby(
-    req,
-    zone,
-    "restaurant",
-    RESTAURANT_DENSITY_RADIUS_M,
-    RESTAURANT_SAMPLE_SIZE,
-    "POPULARITY",
-  );
-  return places.map((p) => {
-    const lat = p.location?.latitude ?? 0;
-    const lng = p.location?.longitude ?? 0;
-    return {
+  try {
+    const places = await searchNearby(
+      req,
+      zone,
+      "restaurant",
+      RESTAURANT_SEARCH_RADIUS_M,
+      RESTAURANT_SAMPLE_SIZE,
+      "POPULARITY",
+      RESTAURANT_FIELD_MASK,
+    );
+    const restaurants: Restaurant[] = places.map((p) => ({
       id: p.id ?? "",
       name: p.displayName?.text ?? "",
       category: p.primaryTypeDisplayName?.text ?? "음식점",
       rating: p.rating ?? 0,
       reviewCount: p.userRatingCount ?? 0,
-      distanceM: Math.round(haversine(zone, { lat, lng }) * 1000),
-    };
-  });
+      distanceM: Math.round(
+        haversine(zone, {
+          lat: p.location?.latitude ?? 0,
+          lng: p.location?.longitude ?? 0,
+        }) * 1000,
+      ),
+    }));
+    return sortByBayesian(restaurants);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "unknown";
+    console.error("[region/recommend] restaurants fetch failed:", msg);
+    return [];
+  }
 }
 
 export async function POST(req: NextRequest) {
-  if (!API_KEY) {
-    return NextResponse.json({ error: "API key missing" }, { status: 500 });
-  }
-
   let input: RecommendInput;
   try {
     input = await req.json();
@@ -191,8 +209,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // 키가 없으면 더미로 응답한다. 키를 꽂으면 코드 수정 없이 실 API로 전환된다.
+  if (!API_KEY) {
+    return NextResponse.json({ result: buildMockResult(input), mock: true });
+  }
+
   try {
-    // 1. 후보 권역 발굴: 중심점 주변 지하철역
+    // 1. 후보 권역 발굴: 중심점 주변 지하철역 (Pro SKU, 1콜)
     const nearby = await searchNearby(
       req,
       center,
@@ -200,6 +223,7 @@ export async function POST(req: NextRequest) {
       CANDIDATE_SEARCH_RADIUS_M,
       MAX_CANDIDATES,
       "DISTANCE",
+      STATION_FIELD_MASK,
     );
     const candidates: Candidate[] = nearby.map((p) => ({
       id: p.id,
@@ -221,29 +245,22 @@ export async function POST(req: NextRequest) {
       MAX_MATRIX_DESTINATIONS,
     );
 
-    // 3. 실제 이동시간(단일 배치) + 후보별 식당 표본(평점·리뷰수 포함)
+    // 3. 실제 대중교통 이동시간 (단일 배치, 1콜)
     const minutes = await computeTransitMinutes(req, origins, survivors);
-    const restaurantsByZone = await Promise.all(
-      survivors.map((zone) => fetchRestaurants(req, zone)),
-    );
 
-    // 4. 채점·랭킹 — 밀집도는 "식당 개수"가 아니라 "좋은 식당 수"
-    const scorable: ScorableZone[] = survivors.map((zone, di) => {
-      const perOrigin: OriginTravel[] = origins.map((origin, oi) => ({
+    // 4. 채점·랭킹 — 이동시간 + 형평성만으로 권역을 정한다
+    const scorable: ScorableZone[] = survivors.map((zone, di) => ({
+      id: zone.id,
+      name: zone.name,
+      lat: zone.lat,
+      lng: zone.lng,
+      perOrigin: origins.map<OriginTravel>((origin, oi) => ({
         stationId: origin.stationId,
         label: origin.label,
         weight: origin.weight,
         minutes: minutes[oi][di],
-      }));
-      return {
-        id: zone.id,
-        name: zone.name,
-        lat: zone.lat,
-        lng: zone.lng,
-        goodRestaurantCount: countGoodRestaurants(restaurantsByZone[di]),
-        perOrigin,
-      };
-    });
+      })),
+    }));
 
     const ranked = rankZones(scorable);
     if (ranked.length === 0) {
@@ -252,14 +269,13 @@ export async function POST(req: NextRequest) {
         { status: 404 },
       );
     }
-    const recommendedIndex = survivors.findIndex((z) => z.id === ranked[0].id);
+
+    // 5. 맛집은 우승 권역에만 조회한다 (Enterprise SKU, 1콜)
+    const restaurants = await fetchRestaurants(req, ranked[0]);
 
     return NextResponse.json({
-      result: {
-        recommended: ranked[0],
-        candidates: ranked,
-        restaurants: sortByBayesian(restaurantsByZone[recommendedIndex] ?? []),
-      },
+      result: { recommended: ranked[0], candidates: ranked, restaurants },
+      mock: false,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "추천에 실패했습니다.";

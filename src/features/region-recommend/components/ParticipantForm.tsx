@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { findStation } from "../constants/stations";
@@ -78,16 +79,26 @@ export function ParticipantForm({ isPending, onSubmit }: Props) {
                 label={participantLabel(index)}
                 value={value}
                 invalid={formState.isSubmitted && !value}
-                canAdd={fields.length < MAX_PARTICIPANTS}
                 canRemove={fields.length > MIN_PARTICIPANTS}
                 onChange={onChange}
-                onAdd={() => append(emptyRow())}
                 onRemove={() => remove(index)}
               />
             )}
           />
         ))}
       </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        size="lg"
+        disabled={fields.length >= MAX_PARTICIPANTS}
+        onClick={() => append(emptyRow())}
+        className="w-full"
+      >
+        <Plus />
+        참여자 추가
+      </Button>
 
       {formState.errors.participants?.message && (
         <p className="text-sm text-destructive">

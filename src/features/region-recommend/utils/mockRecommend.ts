@@ -5,13 +5,12 @@ import {
 import { RESTAURANT_POOL } from "../constants/dummy-restaurants";
 import { STATION_OPTIONS } from "../constants/stations";
 import type {
-  OriginTravel,
   RecommendInput,
   RecommendResult,
   Restaurant,
 } from "../types";
 import { haversine, prefilterByHaversine } from "./geo";
-import { countGoodRestaurants, sortByBayesian } from "./quality";
+import { sortByBayesian } from "./quality";
 import { rankZones, type ScorableZone } from "./score";
 
 function hashString(s: string): number {
@@ -27,7 +26,7 @@ function pseudoMinutes(distanceKm: number): number {
 
 /**
  * 권역별 더미 식당 표본. 평점·리뷰수를 권역+상호로 결정적으로 생성해
- * 권역마다 품질 분포가 달라지게 한다(좋은 식당 밀도가 변별력을 갖도록).
+ * 권역마다 품질 분포가 달라지게 한다(무작위 X — 테스트 안정성).
  */
 function buildMockRestaurants(zoneId: string): Restaurant[] {
   const start = hashString(zoneId) % RESTAURANT_POOL.length;
@@ -50,8 +49,9 @@ function buildMockRestaurants(zoneId: string): Restaurant[] {
 }
 
 /**
- * Mock 모드 추천 — 외부 API 호출 없이 실제 유틸(geo·score·quality)로 결과를 만든다.
- * 실 API 경로와 동일한 채점 로직을 태워, Mock이 로직 결함을 가리지 않게 한다.
+ * API 키가 없을 때 쓰는 더미 추천. 실 라우트와 **동일한 파이프라인**을 태운다
+ * (후보 발굴 → 사전필터 → 이동시간 → 랭킹 → 우승 권역 식당만 조회).
+ * Mock이 실 경로의 로직 결함을 가리지 않도록 채점·정렬 유틸을 그대로 쓴다.
  */
 export function buildMockResult(input: RecommendInput): RecommendResult {
   const candidates = prefilterByHaversine(
@@ -65,36 +65,23 @@ export function buildMockResult(input: RecommendInput): RecommendResult {
     MAX_MATRIX_DESTINATIONS,
   );
 
-  const restaurantsByZone = new Map<string, Restaurant[]>();
-
-  const scorable: ScorableZone[] = candidates.map((zone) => {
-    const restaurants = buildMockRestaurants(zone.id);
-    restaurantsByZone.set(zone.id, restaurants);
-
-    const perOrigin: OriginTravel[] = input.origins.map((origin) => ({
+  const scorable: ScorableZone[] = candidates.map((zone) => ({
+    id: zone.id,
+    name: zone.name,
+    lat: zone.lat,
+    lng: zone.lng,
+    perOrigin: input.origins.map((origin) => ({
       stationId: origin.stationId,
       label: origin.label,
       weight: origin.weight,
       minutes: pseudoMinutes(haversine(origin, zone)),
-    }));
-
-    return {
-      id: zone.id,
-      name: zone.name,
-      lat: zone.lat,
-      lng: zone.lng,
-      goodRestaurantCount: countGoodRestaurants(restaurants),
-      perOrigin,
-    };
-  });
+    })),
+  }));
 
   const ranked = rankZones(scorable);
   return {
     recommended: ranked[0],
     candidates: ranked,
-    restaurants: sortByBayesian(restaurantsByZone.get(ranked[0].id) ?? []).slice(
-      0,
-      6,
-    ),
+    restaurants: sortByBayesian(buildMockRestaurants(ranked[0].id)).slice(0, 6),
   };
 }

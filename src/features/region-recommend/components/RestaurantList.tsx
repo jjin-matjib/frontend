@@ -11,7 +11,7 @@ export function RestaurantList({ zoneName, restaurants }: Props) {
     <section className="flex flex-col gap-3 px-4">
       <div className="flex items-baseline justify-between">
         <h3 className="text-base font-semibold">{zoneName} 맛집</h3>
-        <span className="text-xs text-muted-foreground">추천순 · Mock</span>
+        <span className="text-xs text-muted-foreground">인기 상위 20곳 중 추천순</span>
       </div>
       <ul className="flex flex-col gap-2">
         {restaurants.map((restaurant) => (

@@ -49,8 +49,6 @@ export interface RankedZone {
   name: string;
   lat: number;
   lng: number;
-  /** 후보 반경 내 "좋은 식당" 수 (품질 기반 맛집 밀집도 지표) */
-  goodRestaurantCount: number;
   /** 인원 가중 평균 이동시간(분) — 낮을수록 좋음, 1순위 */
   weightedMeanMinutes: number;
   /** 이동시간 편차(분) = 최대-최소 — 낮을수록 형평성 좋음, 2순위 */
@@ -75,6 +73,12 @@ export interface Restaurant {
 export interface RecommendResult {
   recommended: RankedZone;
   candidates: RankedZone[];
-  /** 추천 권역의 맛집 리스트(현재 Mock. 실 API 연동·랭킹 근거는 기획 확정 후). */
-  restaurants?: Restaurant[];
+  /** 추천 권역의 맛집(인기순 상위 20곳 표본을 베이지안 평균으로 정렬). 조회 실패 시 빈 배열. */
+  restaurants: Restaurant[];
+}
+
+/** POST /api/region/recommend 응답 전체. mock=true면 API 키가 없어 더미로 계산한 결과다. */
+export interface RecommendResponse {
+  result: RecommendResult;
+  mock: boolean;
 }

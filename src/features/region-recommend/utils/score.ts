@@ -1,4 +1,4 @@
-import { GOOD_RESTAURANT_CAP, SCORE_WEIGHTS } from "../constants/config";
+import { SCORE_WEIGHTS } from "../constants/config";
 import type { OriginTravel, RankedZone } from "../types";
 
 /** 채점 전 후보. perOrigin에 이동시간이 채워져 있어야 한다. */
@@ -7,7 +7,6 @@ export interface ScorableZone {
   name: string;
   lat: number;
   lng: number;
-  goodRestaurantCount: number;
   perOrigin: OriginTravel[];
 }
 
@@ -40,18 +39,13 @@ export function rankZones(zones: ScorableZone[]): RankedZone[] {
     .map((zone) => {
       const mean = weightedMeanMinutes(zone.perOrigin);
       const spread = spreadMinutes(zone.perOrigin);
-      const goodCount = Math.min(zone.goodRestaurantCount, GOOD_RESTAURANT_CAP);
-      const score =
-        mean +
-        SCORE_WEIGHTS.spreadPenaltyPerMinute * spread -
-        SCORE_WEIGHTS.densityBonusPerRestaurant * goodCount;
+      const score = mean + SCORE_WEIGHTS.spreadPenaltyPerMinute * spread;
 
       return {
         id: zone.id,
         name: zone.name,
         lat: zone.lat,
         lng: zone.lng,
-        goodRestaurantCount: zone.goodRestaurantCount,
         weightedMeanMinutes: Math.round(mean),
         spreadMinutes: Math.round(spread),
         score,

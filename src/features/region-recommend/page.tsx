@@ -12,18 +12,16 @@ import { RestaurantList } from "./components/RestaurantList";
 import { useRegionRecommendQuery } from "./hooks/useRegionRecommendQuery";
 import type { RecommendInput } from "./types";
 
-// 개발/데모에서는 외부 API를 호출하지 않는다(비용 0). 실 API는 production 빌드에서 동작.
-const USE_MOCK = process.env.NODE_ENV !== "production";
-
 export function RegionRecommendPage() {
   const router = useRouter();
   const [input, setInput] = useState<RecommendInput | null>(null);
   const { data, isPending, isError, isFetching, refetch } =
-    useRegionRecommendQuery(input, USE_MOCK);
+    useRegionRecommendQuery(input);
 
   const submitted = input !== null;
   const participantCount =
     input?.origins.reduce((sum, origin) => sum + origin.weight, 0) ?? 0;
+  const result = data?.result;
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 pb-10">
@@ -50,17 +48,23 @@ export function RegionRecommendPage() {
         </div>
       )}
 
-      {data && input && (
+      {result && input && (
         <div className="flex flex-col gap-4">
+          {data.mock && (
+            <p className="mx-4 rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
+              API 키가 없어 <strong>더미 데이터</strong>로 계산한 결과입니다.
+              `.env.local`에 키를 넣으면 실제 이동시간·맛집으로 바뀝니다.
+            </p>
+          )}
           <RecommendResultCard
-            zone={data.recommended}
+            zone={result.recommended}
             participantCount={participantCount}
           />
-          <RegionMap origins={input.origins} recommended={data.recommended} />
-          {data.restaurants && data.restaurants.length > 0 && (
+          <RegionMap origins={input.origins} recommended={result.recommended} />
+          {result.restaurants.length > 0 && (
             <RestaurantList
-              zoneName={data.recommended.name}
-              restaurants={data.restaurants}
+              zoneName={result.recommended.name}
+              restaurants={result.restaurants}
             />
           )}
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Collapsible } from "@base-ui/react/collapsible";
-import { ChevronDown, Clock, Utensils } from "lucide-react";
+import { ChevronDown, Clock, Scale } from "lucide-react";
 import type { RankedZone } from "../types";
 
 interface Props {
@@ -20,7 +20,7 @@ export function RecommendResultCard({ zone, participantCount }: Props) {
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-bold">{zone.name} 주변</h2>
           <p className="text-sm text-muted-foreground">
-            선택한 {participantCount}명의 평균 이동 시간이 가장 짧아요!
+            선택한 {participantCount}명이 가장 비슷하게 이동할 수 있는 곳이에요!
           </p>
         </div>
 
@@ -29,17 +29,17 @@ export function RecommendResultCard({ zone, participantCount }: Props) {
             <Clock className="size-4" />평균 {zone.weightedMeanMinutes}분
           </span>
           <span className="inline-flex items-center gap-1">
-            <Utensils className="size-4" />맛집 {zone.goodRestaurantCount}곳
+            <Scale className="size-4" />편차 {zone.spreadMinutes}분
           </span>
         </div>
 
-        <Collapsible.Root>
-          <Collapsible.Trigger className="group flex items-center gap-1 text-sm font-medium text-primary outline-none">
+        <Collapsible.Root className="flex flex-col gap-3">
+          <Collapsible.Trigger className="group flex w-fit items-center gap-1 text-sm font-medium text-primary outline-none">
             상세 근거 보기
             <ChevronDown className="size-4 transition-transform group-data-[panel-open]:rotate-180" />
           </Collapsible.Trigger>
           <Collapsible.Panel>
-            <ul className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
+            <ul className="flex flex-col gap-2 border-t border-border pt-3">
               {zone.perOrigin.map((origin) => (
                 <li
                   key={origin.stationId}
@@ -53,7 +53,9 @@ export function RecommendResultCard({ zone, participantCount }: Props) {
                 </li>
               ))}
               <li className="flex items-center justify-between border-t border-border pt-2 text-sm">
-                <span className="text-muted-foreground">이동시간 편차</span>
+                <span className="text-muted-foreground">
+                  가장 오래 걸리는 사람과의 차이
+                </span>
                 <span className="font-medium">{zone.spreadMinutes}분</span>
               </li>
             </ul>

@@ -1,8 +1,8 @@
-import type { RecommendInput, RecommendResult } from "../types";
+import type { RecommendInput, RecommendResponse } from "../types";
 
 export async function postRegionRecommend(
   input: RecommendInput,
-): Promise<RecommendResult> {
+): Promise<RecommendResponse> {
   const res = await fetch("/api/region/recommend", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -12,5 +12,5 @@ export async function postRegionRecommend(
   if (!res.ok) {
     throw new Error(data?.error ?? "권역을 추천하지 못했습니다.");
   }
-  return data.result;
+  return data;
 }
