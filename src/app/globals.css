@@ -87,14 +87,14 @@
   /* Text */
   --place-muted: oklch(0.671 0.012 63.1);
   --place-icon-muted: oklch(0.562 0.020 67.3);
-  --background: oklch(1 0 0);
+  --background: #faf8f5; /* 따뜻한 오프화이트 캔버스 (UI Kit) */
   --foreground: oklch(0.274 0.013 272.9);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.274 0.013 272.9);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.274 0.013 272.9);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #f2551a; /* primary-600 · 기본 버튼/링크 */
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.950 0.008 72.0);
@@ -102,15 +102,15 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --success: oklch(0.627 0.194 149.214);
-  --success-foreground: oklch(0.985 0 0);
+  --success: #37ad4e; /* success-500 · 추천 배지/긍정 상태 */
+  --success-foreground: #ffffff;
   --warning: oklch(0.769 0.188 70.08);
   --warning-foreground: oklch(0.205 0 0);
   --info: oklch(0.623 0.214 259.815);
   --info-foreground: oklch(0.985 0 0);
   --border: oklch(0.889 0.020 49.9);
   --input: oklch(0.889 0.020 49.9);
-  --ring: oklch(0.630 0.135 40.2);
+  --ring: #ff7f3f; /* primary-300 · 포커스 링 */
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -134,8 +134,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #ff6b2c; /* primary-500 · 어두운 배경에서 한 단계 밝게 */
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -151,7 +151,7 @@
   --info-foreground: oklch(0.145 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: #ff9f65; /* primary-300 · 어두운 배경 포커스 링 */
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -220,4 +220,30 @@
       background: var(--place-shadow);
     }
   }
+}
+
+/*
+ * MapBridge 브랜드 색상 스케일 (UI Kit 기준).
+ * bg-primary-600, text-success-700 등 유틸리티로 사용한다.
+ * 시맨틱 토큰(--primary, --success)이 이 스케일을 참조한다.
+ * 사용 가이드: 600–700 기본 버튼/링크 · 800 눌림 · 900 로고/최상단 텍스트 · 50–200 배지/연한 배경
+ */
+@theme {
+  --color-primary-50: #fff3ec;
+  --color-primary-100: #ffe1ce;
+  --color-primary-200: #ffc49c;
+  --color-primary-300: #ff9f65;
+  --color-primary-400: #ff7f3f;
+  --color-primary-500: #ff6b2c;
+  --color-primary-600: #f2551a;
+  --color-primary-700: #d6430f;
+  --color-primary-800: #a8330b;
+  --color-primary-900: #6e2007;
+
+  --color-success-50: #def5e6;
+  --color-success-100: #c3edd1;
+  --color-success-300: #8ddba0;
+  --color-success-500: #37ad4e;
+  --color-success-700: #248a3d;
+  --color-success-900: #155e28;
 }
