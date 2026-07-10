@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getReferer, GOOGLE_API_KEY as API_KEY, googlePlacesClient, googleRoutesClient } from "@/lib/api/google";
+import { getReferer, REGION_GOOGLE_API_KEY as API_KEY, googlePlacesClient, googleRoutesClient } from "@/lib/api/google";
 import { haversine } from "@/lib/geo";
 import {
   CANDIDATE_SEARCH_RADIUS_M,
