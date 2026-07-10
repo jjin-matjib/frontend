@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+import { getReferer, GOOGLE_API_KEY as API_KEY, googlePlacesClient } from "@/lib/api/google";
+import { toPlaceDetail } from "@/features/place-detail/utils/googlePlaceDetail";
 
 const FIELD_MASK = [
   "id",
@@ -16,32 +16,6 @@ const FIELD_MASK = [
   "photos.name",
 ].join(",");
 
-function getReferer(req: NextRequest) {
-  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "localhost:3000";
-  const proto = req.headers.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}/`;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapPlaceDetail(p: any) {
-  return {
-    id: p.id ?? "",
-    name: p.displayName?.text ?? "",
-    category: p.primaryTypeDisplayName?.text ?? "기타",
-    isOpen: p.currentOpeningHours?.openNow ?? false,
-    weekdayHours: (p.regularOpeningHours?.weekdayDescriptions ?? []).map((line: string) =>
-      line.replace("요일", ""),
-    ),
-    phone: p.nationalPhoneNumber ?? "",
-    address: p.formattedAddress ?? "",
-    rating: p.rating ?? 0,
-    reviewCount: p.userRatingCount ?? 0,
-    lat: p.location?.latitude ?? 0,
-    lng: p.location?.longitude ?? 0,
-    photoName: p.photos?.[0]?.name ?? null,
-  };
-}
-
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -49,24 +23,26 @@ export async function GET(
   const { id } = await params;
   if (!API_KEY) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
-  const res = await fetch(
-    `https://places.googleapis.com/v1/places/${encodeURIComponent(id)}?languageCode=ko`,
+  const res = await googlePlacesClient.get(
+    `/places/${encodeURIComponent(id)}`,
     {
+      params: { languageCode: "ko" },
       headers: {
         "X-Goog-Api-Key": API_KEY,
         "Referer": getReferer(req),
         "X-Goog-FieldMask": FIELD_MASK,
       },
+      validateStatus: () => true,
     },
   );
 
-  const data = await res.json();
+  const data = res.data;
 
-  if (!res.ok) {
-    const msg = data?.error?.message ?? res.statusText;
+  if (res.status < 200 || res.status >= 300) {
+    const msg = data?.error?.message ?? `Google Places error (${res.status})`;
     console.error("[places/detail] API error:", msg);
     return NextResponse.json({ error: msg }, { status: res.status === 404 ? 404 : 502 });
   }
 
-  return NextResponse.json({ place: mapPlaceDetail(data) });
+  return NextResponse.json({ place: toPlaceDetail(data) });
 }

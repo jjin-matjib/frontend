@@ -1,16 +1,18 @@
 import type { RecommendInput, RecommendResponse } from "../types";
+import { apiClient, getApiErrorMessage } from "@/lib/api/client";
 
 export async function postRegionRecommend(
   input: RecommendInput,
 ): Promise<RecommendResponse> {
-  const res = await fetch("/api/region/recommend", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data?.error ?? "권역을 추천하지 못했습니다.");
+  try {
+    const { data } = await apiClient.post<RecommendResponse>(
+      "/region/recommend",
+      input,
+    );
+    return data;
+  } catch (error) {
+    throw new Error(
+      getApiErrorMessage(error, "권역을 추천하지 못했습니다."),
+    );
   }
-  return data;
 }

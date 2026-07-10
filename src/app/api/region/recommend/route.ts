@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getReferer, GOOGLE_API_KEY as API_KEY, googlePlacesClient, googleRoutesClient } from "@/lib/api/google";
+import { haversine } from "@/lib/geo";
 import {
   CANDIDATE_SEARCH_RADIUS_M,
   MAX_CANDIDATES,
@@ -13,11 +15,9 @@ import type {
   Restaurant,
 } from "@/features/region-recommend/types";
 import {
-  haversine,
   prefilterByHaversine,
   weightedCentroid,
 } from "@/features/region-recommend/utils/geo";
-import { buildMockResult } from "@/features/region-recommend/utils/mockRecommend";
 import {
   excludeUnrated,
   sortByBayesian,
@@ -27,18 +27,6 @@ import {
   type ScorableZone,
 } from "@/features/region-recommend/utils/score";
 
-/**
- * 서버 전용 키를 우선 읽고, 팀 공용 변수명으로 폴백한다.
- * 키가 없으면 Mock으로 응답하므로 `.env.local`에 키만 꽂으면 실 API로 전환된다.
- */
-const API_KEY =
-  process.env.GOOGLE_MAPS_API_KEY ??
-  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ??
-  "";
-
-const PLACES_NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby";
-const ROUTE_MATRIX_URL =
-  "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix";
 
 /** 역 검색은 평점이 필요 없다 → Pro SKU(월 5,000 무료). */
 const STATION_FIELD_MASK = [
@@ -64,15 +52,6 @@ interface Candidate {
   lng: number;
 }
 
-function getReferer(req: NextRequest) {
-  const host =
-    req.headers.get("x-forwarded-host") ??
-    req.headers.get("host") ??
-    "localhost:3000";
-  const proto = req.headers.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}/`;
-}
-
 /** Places searchNearby 호출. fieldMask가 과금 SKU를 결정하므로 호출부에서 최소한으로 넘긴다. */
 async function searchNearby(
   req: NextRequest,
@@ -83,30 +62,29 @@ async function searchNearby(
   rankPreference: "DISTANCE" | "POPULARITY",
   fieldMask: string,
 ) {
-  const res = await fetch(PLACES_NEARBY_URL, {
-    method: "POST",
+  const res = await googlePlacesClient.post("/places:searchNearby", {
+    includedTypes: [includedType],
+    maxResultCount,
+    rankPreference,
+    languageCode: "ko",
+    locationRestriction: {
+      circle: {
+        center: { latitude: center.lat, longitude: center.lng },
+        radius,
+      },
+    },
+  }, {
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": API_KEY,
       Referer: getReferer(req),
       "X-Goog-FieldMask": fieldMask,
     },
-    body: JSON.stringify({
-      includedTypes: [includedType],
-      maxResultCount,
-      rankPreference,
-      languageCode: "ko",
-      locationRestriction: {
-        circle: {
-          center: { latitude: center.lat, longitude: center.lng },
-          radius,
-        },
-      },
-    }),
+    validateStatus: () => true,
   });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data?.error?.message ?? res.statusText);
+  const data = res.data;
+  if (res.status < 200 || res.status >= 300) {
+    throw new Error(data?.error?.message ?? `Google Places error (${res.status})`);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data.places ?? []) as any[];
@@ -118,31 +96,30 @@ async function computeTransitMinutes(
   origins: RecommendOrigin[],
   destinations: Candidate[],
 ): Promise<number[][]> {
-  const res = await fetch(ROUTE_MATRIX_URL, {
-    method: "POST",
+  const res = await googleRoutesClient.post("/distanceMatrix/v2:computeRouteMatrix", {
+    origins: origins.map((o) => ({
+      waypoint: {
+        location: { latLng: { latitude: o.lat, longitude: o.lng } },
+      },
+    })),
+    destinations: destinations.map((d) => ({
+      waypoint: {
+        location: { latLng: { latitude: d.lat, longitude: d.lng } },
+      },
+    })),
+    travelMode: "TRANSIT",
+  }, {
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": API_KEY,
       Referer: getReferer(req),
       "X-Goog-FieldMask": "originIndex,destinationIndex,duration,condition",
     },
-    body: JSON.stringify({
-      origins: origins.map((o) => ({
-        waypoint: {
-          location: { latLng: { latitude: o.lat, longitude: o.lng } },
-        },
-      })),
-      destinations: destinations.map((d) => ({
-        waypoint: {
-          location: { latLng: { latitude: d.lat, longitude: d.lng } },
-        },
-      })),
-      travelMode: "TRANSIT",
-    }),
+    validateStatus: () => true,
   });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data?.error?.message ?? res.statusText);
+  const data = res.data;
+  if (res.status < 200 || res.status >= 300) {
+    throw new Error(data?.error?.message ?? `Google Routes error (${res.status})`);
   }
 
   const matrix: number[][] = origins.map(() =>
@@ -214,7 +191,10 @@ export async function POST(req: NextRequest) {
 
   // 키가 없으면 더미로 응답한다. 키를 꽂으면 코드 수정 없이 실 API로 전환된다.
   if (!API_KEY) {
-    return NextResponse.json({ result: buildMockResult(input), mock: true });
+    return NextResponse.json(
+      { error: "Google Maps API key is missing" },
+      { status: 500 },
+    );
   }
 
   try {
@@ -278,11 +258,19 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       result: { recommended: ranked[0], candidates: ranked, restaurants },
-      mock: false,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "추천에 실패했습니다.";
     console.error("[region/recommend] API error:", msg);
+    if (msg.includes("Google Routes error (403)")) {
+      return NextResponse.json(
+        {
+          error:
+            "Google Routes API 사용 권한이 없습니다. Google Cloud에서 Routes API와 현재 API 키 제한을 확인해 주세요.",
+        },
+        { status: 503 },
+      );
+    }
     return NextResponse.json({ error: msg }, { status: 502 });
   }
 }

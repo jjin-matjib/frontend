@@ -57,8 +57,6 @@ export interface RecommendResult {
   restaurants: Restaurant[];
 }
 
-/** POST /api/region/recommend 응답 전체. mock=true면 API 키가 없어 더미로 계산한 결과다. */
 export interface RecommendResponse {
   result: RecommendResult;
-  mock: boolean;
 }

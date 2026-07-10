@@ -20,3 +20,10 @@ export type SearchFilters = {
   open: OpenStatus | null;
   sort: Sort | null;
 };
+
+export interface SearchSuggestion {
+  placeId: string;
+  text: string;
+  mainText: string;
+  secondaryText: string;
+}
