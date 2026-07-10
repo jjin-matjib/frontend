@@ -7,8 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-pretendard);
+  --font-mono: var(--font-pretendard);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -52,33 +52,97 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --color-place-primary: var(--place-primary);
+  --color-place-primary-fg: var(--place-primary-fg);
+  --color-place-header: var(--place-header);
+  --color-place-marker: var(--place-marker);
+  --color-place-accent: var(--place-accent);
+  --color-place-bg: var(--place-bg);
+  --color-place-surface: var(--place-surface);
+  --color-place-map-bg: var(--place-map-bg);
+  --color-place-divider: var(--place-divider);
+  --color-place-shadow: var(--place-shadow);
+  --color-place-open: var(--place-open);
+  --color-place-open-bg: var(--place-open-bg);
+  --color-place-muted: var(--place-muted);
+  --color-place-icon-muted: var(--place-icon-muted);
+}
+
+/*
+ * 수도권 전철 노선색. 운영기관 공식 색상(위키백과 「틀:한국 철도 노선색」)이라
+ * 테마에 따라 바뀌지 않는 고정 브랜드 색이다. bg-line-* 유틸리티로 사용한다.
+ */
+@theme {
+  --color-line-1: #0052a4;
+  --color-line-2: #00a84d;
+  --color-line-3: #ef7c1c;
+  --color-line-4: #00a5de;
+  --color-line-5: #996cac;
+  --color-line-6: #cd7c2f;
+  --color-line-7: #747f00;
+  --color-line-8: #e6186c;
+  --color-line-9: #bdb092;
+  --color-line-suinbundang: #f5a200;
+  --color-line-sinbundang: #d4003b;
+  --color-line-gyeongui: #77c4a3;
+  --color-line-gyeongchun: #0c8e72;
+  --color-line-airport: #0090d2;
+  --color-line-uisinseol: #b0ce18;
+  --color-line-sillim: #6789ca;
+  --color-line-seohae: #81a914;
+  --color-line-gyeonggang: #003da5;
+  --color-line-gimpo: #a17800;
+  --color-line-incheon1: #7ca8d5;
+  --color-line-incheon2: #ed8b00;
+  --color-line-gtxa: #9a6292;
+  --color-line-uijeongbu: #fda600;
+  --color-line-everline: #509f22;
+  --color-line-unknown: #9ca3af;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Brand */
+  --place-primary: oklch(0.630 0.135 40.2);
+  --place-primary-fg: oklch(0.992 0.002 66.2);
+  --place-header: oklch(0.373 0.050 165.1);
+  --place-marker: oklch(0.593 0.151 36.7);
+  --place-accent: oklch(0.554 0.167 35.9);
+  /* Background / Surface */
+  --place-bg: oklch(0.989 0.004 78.0);
+  --place-surface: oklch(0.992 0.002 66.2);
+  --place-map-bg: oklch(0.969 0.010 72.5);
+  --place-divider: oklch(0.928 0.014 57.4);
+  --place-shadow: oklch(0.843 0.023 54.1);
+  /* Status */
+  --place-open: oklch(0.584 0.048 166.3);
+  --place-open-bg: oklch(0.955 0.011 112.6);
+  /* Text */
+  --place-muted: oklch(0.671 0.012 63.1);
+  --place-icon-muted: oklch(0.562 0.020 67.3);
+  --background: #faf8f5; /* 따뜻한 오프화이트 캔버스 (UI Kit) */
+  --foreground: oklch(0.274 0.013 272.9);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.274 0.013 272.9);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --popover-foreground: oklch(0.274 0.013 272.9);
+  --primary: #f2551a; /* primary-600 · 기본 버튼/링크 */
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted: oklch(0.950 0.008 72.0);
+  --muted-foreground: oklch(0.522 0.013 63.1);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --success: oklch(0.627 0.194 149.214);
-  --success-foreground: oklch(0.985 0 0);
+  --success: #37ad4e; /* success-500 · 추천 배지/긍정 상태 */
+  --success-foreground: #ffffff;
   --warning: oklch(0.769 0.188 70.08);
   --warning-foreground: oklch(0.205 0 0);
   --info: oklch(0.623 0.214 259.815);
   --info-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.889 0.020 49.9);
+  --input: oklch(0.889 0.020 49.9);
+  --ring: #ff7f3f; /* primary-300 · 포커스 링 */
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -102,8 +166,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #ff6b2c; /* primary-500 · 어두운 배경에서 한 단계 밝게 */
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -119,7 +183,7 @@
   --info-foreground: oklch(0.145 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: #ff9f65; /* primary-300 · 어두운 배경 포커스 링 */
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -161,4 +225,57 @@
   html {
     @apply font-sans;
   }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .scrollbar-place {
+    scrollbar-width: thin;
+    scrollbar-color: var(--place-divider) transparent;
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--place-divider);
+      border-radius: 9999px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--place-shadow);
+    }
+  }
+}
+
+/*
+ * MapBridge 브랜드 색상 스케일 (UI Kit 기준).
+ * bg-primary-600, text-success-700 등 유틸리티로 사용한다.
+ * 시맨틱 토큰(--primary, --success)이 이 스케일을 참조한다.
+ * 사용 가이드: 600–700 기본 버튼/링크 · 800 눌림 · 900 로고/최상단 텍스트 · 50–200 배지/연한 배경
+ */
+@theme {
+  --color-primary-50: #fff3ec;
+  --color-primary-100: #ffe1ce;
+  --color-primary-200: #ffc49c;
+  --color-primary-300: #ff9f65;
+  --color-primary-400: #ff7f3f;
+  --color-primary-500: #ff6b2c;
+  --color-primary-600: #f2551a;
+  --color-primary-700: #d6430f;
+  --color-primary-800: #a8330b;
+  --color-primary-900: #6e2007;
+
+  --color-success-50: #def5e6;
+  --color-success-100: #c3edd1;
+  --color-success-300: #8ddba0;
+  --color-success-500: #37ad4e;
+  --color-success-700: #248a3d;
+  --color-success-900: #155e28;
 }

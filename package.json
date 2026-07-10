@@ -2,6 +2,10 @@
   "name": "jjin-matjib",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.20.0",
+    "pnpm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,14 +15,19 @@
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@hookform/resolvers": "^5.4.0",
+    "@lukemorales/query-key-factory": "^1.3.4",
     "@tanstack/react-query": "^5.101.2",
+    "@vis.gl/react-google-maps": "^1.9.0",
+    "axios": "^1.18.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.23.0",
     "next": "16.2.10",
     "nuqs": "^2.9.0",
+    "pretendard": "^1.3.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-error-boundary": "^6.1.2",
     "react-hook-form": "^7.81.0",
     "shadcn": "^4.13.0",
     "tailwind-merge": "^3.6.0",
