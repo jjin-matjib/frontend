@@ -11,8 +11,8 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "jjin-matjib",
-  description: "맛지도",
+  title: "먹지도",
+  description: "먹지도 — 맛집 검색과 만남 권역 추천",
 };
 
 export default function RootLayout({
