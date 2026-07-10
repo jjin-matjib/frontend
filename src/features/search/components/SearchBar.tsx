@@ -6,14 +6,10 @@ import { Button } from "@/components/ui/button";
 import { useRecentSearches } from "../hooks/useRecentSearches";
 import { useSearchFilters } from "../hooks/useSearchFilters";
 import { useSearchQuery } from "../hooks/useSearchQuery";
-import {
-  type SearchSuggestion,
-  useSearchAutocomplete,
-} from "../hooks/useSearchAutocomplete";
+import { useSearchAutocomplete } from "../hooks/useSearchAutocomplete";
 
 type SearchBarProps = {
   onOpenFilter: () => void;
-  mockSuggestions?: SearchSuggestion[];
 };
 
 /**
@@ -21,7 +17,7 @@ type SearchBarProps = {
  * - 제출 시 검색어를 URL과 최근 검색 기록에 반영한다.
  * - 초기화는 검색어와 모든 필터를 함께 비운다.
  */
-export function SearchBar({ onOpenFilter, mockSuggestions }: SearchBarProps) {
+export function SearchBar({ onOpenFilter }: SearchBarProps) {
   const { query, setQuery } = useSearchQuery();
   const { resetFilters } = useSearchFilters();
   const { add } = useRecentSearches();
@@ -29,12 +25,7 @@ export function SearchBar({ onOpenFilter, mockSuggestions }: SearchBarProps) {
   const [prevQuery, setPrevQuery] = useState(query);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const apiSuggestions = useSearchAutocomplete(value, !!mockSuggestions);
-  const suggestions = mockSuggestions
-    ? mockSuggestions.filter((suggestion) =>
-        suggestion.mainText.toLowerCase().includes(value.toLowerCase()),
-      )
-    : apiSuggestions;
+  const suggestions = useSearchAutocomplete(value);
 
   // 최근 검색 칩 클릭 등 외부에서 검색어가 바뀌면 입력창도 동기화한다.
   if (query !== prevQuery) {

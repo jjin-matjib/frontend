@@ -17,9 +17,12 @@ GOOGLE_MAPS_API_KEY=AIza...
 
 # 클라이언트에서 Maps JS SDK를 쓰는 경우에만 필요 (번들에 노출됨)
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIza...
+NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=your-map-id
 ```
 
-키가 없어도 앱은 동작한다. 권역 추천(`/region`)은 **키가 없으면 더미 데이터로 응답**하고, 키를 넣고 재시작하면 코드 수정 없이 실제 API를 사용한다.
+장소 검색·자동완성·지도·상세·권역 추천은 모두 Google API의 실제 데이터를 사용한다.
+권역 추천 서버 라우트는 `GOOGLE_MAPS_API_KEY`를 우선 사용하고, 없으면
+`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`를 사용한다.
 
 ### 활성화가 필요한 Google API
 
@@ -27,6 +30,7 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIza...
 | --- | --- |
 | **Places API (New)** | 장소 검색·상세, 권역 추천의 역/식당 조회 |
 | **Routes API** | 권역 추천의 대중교통 이동시간 (`computeRouteMatrix`) |
+| **Maps JavaScript API** | 검색·권역 추천 지도 렌더링 |
 
 ### 키 제한 주의
 

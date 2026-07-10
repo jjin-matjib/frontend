@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Clock } from 'lucide-react';
 import { useQueryState } from 'nuqs';
-import { DUMMY_AUTOCOMPLETE_SUGGESTIONS } from './constants/dummy-places';
 import { FooterNav } from '@/components/FooterNav';
 import { SearchHeader } from '@/features/search';
 import { FullMap } from './components/FullMap';
@@ -15,14 +14,11 @@ import { usePlaces } from './hooks/usePlaces';
 import { useViewTab } from './hooks/useViewTab';
 import { toMarkers } from './utils/map';
 
-const isDev = process.env.NODE_ENV === 'development';
-
 export function PlaceSearchPage() {
   const [tab, setTab] = useViewTab();
   const [query] = useQueryState('q');
-  const [useMock, setUseMock] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { places, allPlaces, hasMore, loadMore, loading, error } = usePlaces(query, useMock);
+  const { places, allPlaces, hasMore, loadMore, loading, error } = usePlaces(query);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0 });
@@ -49,22 +45,9 @@ export function PlaceSearchPage() {
       {/* 헤더 placeholder — 별도 담당자 구현 예정 */}
       <div className="shrink-0 h-14 px-4 flex items-center gap-3">
         <p className="text-xl font-bold text-place-header">먹지도</p>
-        {isDev && (
-          <button
-            type="button"
-            onClick={() => setUseMock((v) => !v)}
-            className={`ml-auto text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
-              useMock
-                ? 'bg-muted text-muted-foreground border-border hover:bg-muted/70'
-                : 'bg-place-primary/10 text-place-primary border-place-primary/30 hover:bg-place-primary/20'
-            }`}
-          >
-            {useMock ? 'MOCK' : 'API'}
-          </button>
-        )}
       </div>
 
-      <SearchHeader mockSuggestions={useMock ? DUMMY_AUTOCOMPLETE_SUGGESTIONS : undefined} />
+      <SearchHeader />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {hasResults ? (
