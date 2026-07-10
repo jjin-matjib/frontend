@@ -14,6 +14,13 @@ export const GOOGLE_API_KEY =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ??
   "";
 
+/**
+ * 권역 추천 전용 Google API 키 (Routes API 등 별도 키 사용).
+ * 미설정 시 공용 키로 폴백한다.
+ */
+export const REGION_GOOGLE_API_KEY =
+  process.env.REGION_GOOGLE_MAPS_API_KEY ?? GOOGLE_API_KEY;
+
 /** Google API 키의 HTTP 리퍼러 제한을 통과시키기 위한 Referer 값. */
 export function getReferer(req: NextRequest) {
   const host =
