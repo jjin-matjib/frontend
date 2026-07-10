@@ -7,14 +7,11 @@
 export const MIN_PARTICIPANTS = 2;
 export const MAX_PARTICIPANTS = 6;
 
-/** Places로 발굴하는 후보 권역(역) 최대 수 */
-export const MAX_CANDIDATES = 8;
-
-/** Haversine 사전필터 후 Route Matrix에 넘기는 후보 최대 수(유료 호출 상한) */
+/**
+ * Haversine 사전필터 후 Route Matrix에 넘기는 후보 최대 수(유료 호출 상한).
+ * 후보는 Places가 아니라 우리 역 데이터(seoul-stations.json)에서 뽑는다.
+ */
 export const MAX_MATRIX_DESTINATIONS = 4;
-
-/** 후보 역 탐색 반경(m) — 가중 중심점 주변 */
-export const CANDIDATE_SEARCH_RADIUS_M = 4000;
 
 /** 추천 권역 주변 식당 탐색 반경(m) */
 export const RESTAURANT_SEARCH_RADIUS_M = 500;

@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  CANDIDATE_SEARCH_RADIUS_M,
-  MAX_CANDIDATES,
   MAX_MATRIX_DESTINATIONS,
   RESTAURANT_SAMPLE_SIZE,
   RESTAURANT_SEARCH_RADIUS_M,
 } from "@/features/region-recommend/constants/config";
+import { STATION_OPTIONS } from "@/features/region-recommend/constants/stations";
 import type {
   OriginTravel,
   RecommendInput,
@@ -39,21 +38,6 @@ const API_KEY =
 const PLACES_NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby";
 const ROUTE_MATRIX_URL =
   "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix";
-
-/**
- * 후보 권역으로 쓸 역 타입.
- * Places API(New)의 `includedTypes`는 Table A 타입만 허용한다.
- * `subway_station`은 Table B(응답 전용)라 필터로 넣으면 400이 난다.
- * 한국 지하철역은 Google에서 train_station / transit_station 으로도 분류되므로 이 둘을 쓴다.
- */
-const STATION_INCLUDED_TYPES = ["train_station", "transit_station"];
-
-/** 역 검색은 평점이 필요 없다 → Pro SKU(월 5,000 무료). */
-const STATION_FIELD_MASK = [
-  "places.id",
-  "places.displayName",
-  "places.location",
-].join(",");
 
 /** 식당은 평점·리뷰수가 필요하다 → Enterprise SKU(월 1,000 무료). 우승 권역 1곳에만 쓴다. */
 const RESTAURANT_FIELD_MASK = [
@@ -229,42 +213,24 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // 1. 후보 권역 발굴: 중심점 주변 역 (Pro SKU, 1콜)
-    //    `subway_station`은 Table B라 includedTypes에 넣을 수 없다(400).
-    //    Table A인 train_station·transit_station으로 지하철역을 포함해 조회한다.
-    const nearby = await searchNearby(
-      req,
-      center,
-      STATION_INCLUDED_TYPES,
-      CANDIDATE_SEARCH_RADIUS_M,
-      MAX_CANDIDATES,
-      "DISTANCE",
-      STATION_FIELD_MASK,
-    );
-    const candidates: Candidate[] = nearby.map((p) => ({
-      id: p.id,
-      name: p.displayName?.text ?? "역",
-      lat: p.location?.latitude ?? 0,
-      lng: p.location?.longitude ?? 0,
-    }));
-    if (candidates.length === 0) {
-      return NextResponse.json(
-        { error: "주변에서 후보 권역을 찾지 못했습니다." },
-        { status: 404 },
-      );
-    }
-
-    // 2. Haversine 사전필터로 유료 호출 대상 축소
+    // 1. 후보 권역: 우리 역 데이터(서울 600역)에서 인원 가중 직선거리 상위 K개.
+    //    Places로 역을 찾으면 `transit_station`에 전망대·버스정류장 같은 POI가 섞이고
+    //    이름("동작")·노선 정보도 부정확하다. 우리 데이터가 더 정확하고 유료 호출도 아낀다.
     const survivors = prefilterByHaversine(
       origins,
-      candidates,
+      STATION_OPTIONS.map<Candidate>((station) => ({
+        id: station.value,
+        name: station.label,
+        lat: station.lat,
+        lng: station.lng,
+      })),
       MAX_MATRIX_DESTINATIONS,
     );
 
-    // 3. 실제 대중교통 이동시간 (단일 배치, 1콜)
+    // 2. 실제 대중교통 이동시간 (단일 배치, 1콜)
     const minutes = await computeTransitMinutes(req, origins, survivors);
 
-    // 4. 채점·랭킹 — 이동시간 + 형평성만으로 권역을 정한다
+    // 3. 채점·랭킹 — 이동시간 + 형평성만으로 권역을 정한다
     const scorable: ScorableZone[] = survivors.map((zone, di) => ({
       id: zone.id,
       name: zone.name,
@@ -286,7 +252,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. 맛집은 우승 권역에만 조회한다 (Enterprise SKU, 1콜)
+    // 4. 맛집은 우승 권역에만 조회한다 (Enterprise SKU, 1콜)
     const restaurants = await fetchRestaurants(req, ranked[0]);
 
     return NextResponse.json({
