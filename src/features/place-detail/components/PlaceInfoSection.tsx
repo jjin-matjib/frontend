@@ -92,7 +92,8 @@ export function PlaceInfoSection({ place }: Props) {
               src={`/api/places/photo?name=${encodeURIComponent(place.photoName)}&maxWidthPx=300`}
               alt={place.name}
               fill
-              sizes="1500px"
+              sizes="(max-width: 375px) 35vw, 140px"
+              unoptimized
               className="object-cover"
             />
           </div>

@@ -13,7 +13,7 @@ export function GlobalErrorModal() {
   return (
     <div
       role="presentation"
-      className="fixed inset-0 z-(--z-modal) flex items-center justify-center bg-black/40 px-4"
+      className="fixed inset-0 z-(--z-modal) flex items-center justify-center bg-black/40 px-[15px]"
       onMouseDown={close}
     >
       <section
@@ -21,7 +21,7 @@ export function GlobalErrorModal() {
         aria-modal="true"
         aria-labelledby="global-error-title"
         aria-describedby="global-error-description"
-        className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-border bg-background p-5 shadow-xl"
+        className="flex w-full max-w-[345px] flex-col gap-4 rounded-lg border border-border bg-background p-5 shadow-xl"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-start gap-3">

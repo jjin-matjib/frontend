@@ -6,9 +6,16 @@ import { Button } from "@/components/ui/button";
 interface Props {
   error: unknown;
   resetErrorBoundary: () => void;
+  isRetrying?: boolean;
+  onRetry?: () => void;
 }
 
-export function SectionErrorFallback({ error, resetErrorBoundary }: Props) {
+export function SectionErrorFallback({
+  error,
+  resetErrorBoundary,
+  isRetrying = false,
+  onRetry = resetErrorBoundary,
+}: Props) {
   const message =
     error instanceof Error ? error.message : "예상하지 못한 오류가 발생했습니다.";
 
@@ -24,9 +31,9 @@ export function SectionErrorFallback({ error, resetErrorBoundary }: Props) {
           {message}
         </p>
       </div>
-      <Button variant="outline" onClick={resetErrorBoundary}>
+      <Button variant="outline" disabled={isRetrying} onClick={onRetry}>
         <RotateCcw />
-        다시 시도
+        {isRetrying ? "다시 시도 중" : "다시 시도"}
       </Button>
     </section>
   );

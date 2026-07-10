@@ -18,7 +18,7 @@ const MAP_LINKS = [
     icon: "/assets/icon-naver-map.png",
   },
   {
-    label: "Google Maps",
+    label: "Google",
     getUrl: getGoogleMapUrl,
     icon: "/assets/icon-google-map.png",
   },
@@ -39,7 +39,7 @@ export function MapLinkButtons({ place }: Props) {
           <a
             key={label}
             href={getUrl(place)}
-            className="flex h-10 items-center justify-center gap-1 rounded-lg border text-sm leading-5 font-medium transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+            className="flex h-10 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm leading-5 font-medium transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
           >
             {label}
             <Image
