@@ -56,5 +56,5 @@ export const OPEN_STATUS_VALUES = OPEN_STATUS_OPTIONS.map((o) => o.value);
 export const SORT_VALUES = SORT_OPTIONS.map((o) => o.value);
 
 /** 최근 검색 기록 저장 키 및 최대 개수 */
-export const RECENT_SEARCHES_KEY = "mapbridge:recent-searches";
+export const RECENT_SEARCHES_KEY = "muk-jido:recent-searches";
 export const RECENT_SEARCHES_MAX = 10;
