@@ -15,7 +15,7 @@ import type { RecommendInput } from "./types";
 export function RegionRecommendPage() {
   const router = useRouter();
   const [input, setInput] = useState<RecommendInput | null>(null);
-  const { data, isPending, isError, isFetching, refetch } =
+  const { data, error, isPending, isError, isFetching, refetch } =
     useRegionRecommendQuery(input);
 
   const submitted = input !== null;
@@ -40,6 +40,11 @@ export function RegionRecommendPage() {
           <p className="text-sm leading-5 text-muted-foreground">
             권역을 추천하지 못했습니다.
           </p>
+          {error?.message && (
+            <p className="max-w-full text-center text-xs break-words text-destructive">
+              {error.message}
+            </p>
+          )}
           <Button variant="outline" onClick={() => refetch()}>
             다시 시도
           </Button>
