@@ -12,7 +12,7 @@ const pretendard = localFont({
 
 export const metadata: Metadata = {
   title: "jjin-matjib",
-  description: "찐맛집",
+  description: "맛지도",
 };
 
 export default function RootLayout({
