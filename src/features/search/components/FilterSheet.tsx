@@ -70,7 +70,7 @@ export function FilterSheet({ open, onOpenChange }: FilterSheetProps) {
       <Drawer.Portal>
         <Drawer.Backdrop className="fixed inset-0 z-(--z-overlay) bg-black/40 transition-opacity data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
         <Drawer.Viewport className="pointer-events-none fixed inset-0 z-(--z-modal) flex items-end justify-center">
-          <Drawer.Popup className="pointer-events-auto flex max-h-[85dvh] w-full max-w-md flex-col rounded-t-3xl border-t border-border bg-background pb-[env(safe-area-inset-bottom)] transition-transform data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full">
+          <Drawer.Popup className="pointer-events-auto flex max-h-[85dvh] w-full max-w-[375px] flex-col rounded-t-3xl border-t border-border bg-background pb-[env(safe-area-inset-bottom)] transition-transform data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full">
             <div
               aria-hidden
               className="mx-auto mt-3 h-1.5 w-10 rounded-full bg-border"

@@ -6,7 +6,7 @@ import { placeSearchKeys } from '../constants/queryKeys';
 
 export function usePlaceSearch(query: string | null) {
   const result = useQuery({
-    queryKey: placeSearchKeys.list(query ?? ''),
+    queryKey: placeSearchKeys.list(query ?? '').queryKey,
     queryFn: () => getPlaces(query!),
     enabled: Boolean(query),
   });

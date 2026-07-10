@@ -279,6 +279,15 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     const msg = e instanceof Error ? e.message : "추천에 실패했습니다.";
     console.error("[region/recommend] API error:", msg);
+    if (msg.includes("Google Routes error (403)")) {
+      return NextResponse.json(
+        {
+          error:
+            "Google Routes API 사용 권한이 없습니다. Google Cloud에서 Routes API와 현재 API 키 제한을 확인해 주세요.",
+        },
+        { status: 503 },
+      );
+    }
     return NextResponse.json({ error: msg }, { status: 502 });
   }
 }

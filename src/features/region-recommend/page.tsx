@@ -2,25 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { FooterNav } from "@/components/FooterNav";
+import { ErrorBoundary } from "react-error-boundary";
+import { SectionErrorFallback } from "@/components/SectionErrorFallback";
 import { ParticipantForm } from "./components/ParticipantForm";
 import { RecommendResultCard } from "./components/RecommendResultCard";
 import { RecommendSkeleton } from "./components/RecommendSkeleton";
 import { RegionHeader } from "./components/RegionHeader";
 import { RegionMap } from "./components/RegionMap";
 import { RestaurantList } from "./components/RestaurantList";
-import { useRegionRecommendQuery } from "./hooks/useRegionRecommendQuery";
+import { useRegionRecommendMutation } from "./hooks/useRegionRecommendMutation";
 import type { RecommendInput } from "./types";
 
 export function RegionRecommendPage() {
   const router = useRouter();
   const [input, setInput] = useState<RecommendInput | null>(null);
-  const { data, isPending, isError, isFetching, refetch } =
-    useRegionRecommendQuery(input);
+  const { data, error, isPending, mutate, reset } =
+    useRegionRecommendMutation();
 
-  const submitted = input !== null;
   const result = data?.result;
+
+  const handleSubmit = (nextInput: RecommendInput) => {
+    setInput(nextInput);
+    mutate(nextInput);
+  };
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-lg flex-1 flex-col gap-6">
@@ -30,38 +35,33 @@ export function RegionRecommendPage() {
       </p>
 
       <ParticipantForm
-        isPending={submitted && isFetching}
-        onSubmit={setInput}
+        isPending={isPending}
+        onSubmit={handleSubmit}
       />
 
-      {submitted && isPending && <RecommendSkeleton />}
-
-      {submitted && isError && (
-        <div className="flex flex-col items-center gap-3 px-4 py-10">
-          <p className="text-sm leading-5 text-muted-foreground">
-            권역을 추천하지 못했습니다.
-          </p>
-          <Button variant="outline" onClick={() => refetch()}>
-            다시 시도
-          </Button>
-        </div>
-      )}
-
-      {result && input && (
-        <div className="flex flex-col gap-4">
-          <RecommendResultCard zone={result.recommended} />
-          <RegionMap origins={input.origins} recommended={result.recommended} />
-          {result.restaurants.length > 0 && (
-            <RestaurantList
-              zoneName={result.recommended.name}
-              restaurants={result.restaurants}
-            />
-          )}
-        </div>
-      )}
+      <ErrorBoundary FallbackComponent={SectionErrorFallback} onReset={reset}>
+        {error && <MutationError error={error} />}
+        {isPending && <RecommendSkeleton />}
+        {result && input && (
+          <div className="flex flex-col gap-4">
+            <RecommendResultCard zone={result.recommended} />
+            <RegionMap origins={input.origins} recommended={result.recommended} />
+            {result.restaurants.length > 0 && (
+              <RestaurantList
+                zoneName={result.recommended.name}
+                restaurants={result.restaurants}
+              />
+            )}
+          </div>
+        )}
+      </ErrorBoundary>
       <div className="mt-auto pt-4">
         <FooterNav />
       </div>
     </main>
   );
+}
+
+function MutationError({ error }: { error: Error }): React.ReactNode {
+  throw error;
 }

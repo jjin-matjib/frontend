@@ -1,4 +1,5 @@
-export const placeDetailKeys = {
-  all: ["place-detail"] as const,
-  detail: (placeId: string) => [...placeDetailKeys.all, placeId] as const,
-};
+import { createQueryKeys } from "@lukemorales/query-key-factory";
+
+export const placeDetailKeys = createQueryKeys("place-detail", {
+  detail: (placeId: string) => [placeId],
+});

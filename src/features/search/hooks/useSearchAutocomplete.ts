@@ -16,7 +16,7 @@ export function useSearchAutocomplete(input: string, disabled = false) {
 
   const enabled = !disabled && debouncedInput.length >= 2;
   const { data } = useQuery({
-    queryKey: searchKeys.autocomplete(debouncedInput),
+    queryKey: searchKeys.autocomplete(debouncedInput).queryKey,
     queryFn: () => getPlaceSuggestions(debouncedInput),
     enabled,
     staleTime: 5 * 60 * 1000,

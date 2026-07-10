@@ -3,12 +3,22 @@
 import {
   QueryClient,
   QueryClientProvider,
+  MutationCache,
   environmentManager,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { getApiErrorMessage } from "@/lib/api/client";
+import { useErrorModalStore } from "@/stores/errorModalStore";
 
 function makeQueryClient() {
   return new QueryClient({
+    mutationCache: new MutationCache({
+      onError: (error) => {
+        useErrorModalStore
+          .getState()
+          .show(getApiErrorMessage(error, "요청 처리 중 오류가 발생했습니다."));
+      },
+    }),
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
