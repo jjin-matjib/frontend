@@ -5,11 +5,11 @@ import { Clock } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { DUMMY_AUTOCOMPLETE_SUGGESTIONS } from './constants/dummy-places';
 import { FooterNav } from '@/components/FooterNav';
+import { SearchHeader } from '@/features/search';
 import { FullMap } from './components/FullMap';
 import { MapPreview } from './components/MapPreview';
 import { PlaceList } from './components/PlaceList';
 import { ResultHeader } from './components/ResultHeader';
-import { SearchBar } from './components/SearchBar';
 import { ViewToggle } from './components/ViewToggle';
 import { usePlaces } from './hooks/usePlaces';
 import { useViewTab } from './hooks/useViewTab';
@@ -64,7 +64,7 @@ export function PlaceSearchPage() {
         )}
       </div>
 
-      <SearchBar mockSuggestions={useMock ? DUMMY_AUTOCOMPLETE_SUGGESTIONS : undefined} />
+      <SearchHeader mockSuggestions={useMock ? DUMMY_AUTOCOMPLETE_SUGGESTIONS : undefined} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {hasResults ? (

@@ -8,6 +8,7 @@ import {
   Wine,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import Link from 'next/link';
 import type { Place } from '../types';
 
 interface CategoryConfig {
@@ -37,7 +38,10 @@ export function PlaceCard({ place }: Props) {
   const { icon: Icon, bg, color } = getCategoryConfig(place.category);
 
   return (
-    <div className="flex gap-3 bg-place-surface rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+    <Link
+      href={`/places/${encodeURIComponent(place.id)}`}
+      className="flex gap-3 bg-place-surface rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow"
+    >
       <div className={`w-20 h-20 rounded-lg shrink-0 flex items-center justify-center ${bg}`}>
         <Icon className={`w-8 h-8 ${color}`} />
       </div>
@@ -72,6 +76,6 @@ export function PlaceCard({ place }: Props) {
         <ChevronRight className="w-4 h-4 text-muted-foreground" />
         <span className="text-xs text-muted-foreground">{place.distanceKm}km</span>
       </div>
-    </div>
+    </Link>
   );
 }

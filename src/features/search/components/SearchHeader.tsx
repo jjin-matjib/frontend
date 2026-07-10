@@ -7,20 +7,28 @@ import { AppliedFilters } from "./AppliedFilters";
 import { FilterSheet } from "./FilterSheet";
 import { RecentSearches } from "./RecentSearches";
 import { SearchBar } from "./SearchBar";
+import type { SearchSuggestion } from "../hooks/useSearchAutocomplete";
 
 /**
  * 검색 화면 상단 영역: 검색바 · 필터 · 초기화 · 최근 검색 기록.
  * - 필터가 적용돼 있으면 적용된 필터를 보여준다.
  * - 그렇지 않고 검색어가 비어 있으면 최근 검색 기록을 보여준다.
  */
-export function SearchHeader() {
+interface Props {
+  mockSuggestions?: SearchSuggestion[];
+}
+
+export function SearchHeader({ mockSuggestions }: Props) {
   const [filterOpen, setFilterOpen] = useState(false);
   const { query } = useSearchQuery();
   const { hasActiveFilters } = useSearchFilters();
 
   return (
-    <div className="flex flex-col gap-4">
-      <SearchBar onOpenFilter={() => setFilterOpen(true)} />
+    <div className="flex shrink-0 flex-col gap-3 px-4 py-3">
+      <SearchBar
+        mockSuggestions={mockSuggestions}
+        onOpenFilter={() => setFilterOpen(true)}
+      />
 
       {hasActiveFilters ? (
         <AppliedFilters onEditFilter={() => setFilterOpen(true)} />

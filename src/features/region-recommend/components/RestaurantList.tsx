@@ -1,4 +1,5 @@
 import { MapPin, Star } from "lucide-react";
+import Link from "next/link";
 import { RESTAURANT_DISPLAY_COUNT } from "../constants/config";
 import type { Restaurant } from "../types";
 
@@ -18,10 +19,11 @@ export function RestaurantList({ zoneName, restaurants }: Props) {
       </div>
       <ul className="flex flex-col gap-2">
         {visible.map((restaurant) => (
-          <li
-            key={restaurant.id}
-            className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3"
-          >
+          <li key={restaurant.id}>
+            <Link
+              href={`/places/${encodeURIComponent(restaurant.id)}`}
+              className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3"
+            >
             <div className="flex min-w-0 flex-col gap-1">
               <div className="flex min-w-0 items-center gap-2">
                 <span className="truncate font-medium">{restaurant.name}</span>
@@ -41,6 +43,7 @@ export function RestaurantList({ zoneName, restaurants }: Props) {
                 </span>
               </div>
             </div>
+            </Link>
           </li>
         ))}
       </ul>
