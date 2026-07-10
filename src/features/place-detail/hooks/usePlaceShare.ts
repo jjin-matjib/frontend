@@ -92,7 +92,7 @@ async function drawShareCard(place: PlaceDetail): Promise<HTMLCanvasElement> {
 
   ctx.fillStyle = COLOR_MUTED_FOREGROUND;
   ctx.font = `500 16px ${CARD_FONT}`;
-  ctx.fillText("맛지도", CARD_PAD_X, 60);
+  ctx.fillText("먹지도", CARD_PAD_X, 60);
 
   // 가게 이름 + 카테고리 배지 (PlaceInfoSection 첫 줄과 동일한 순서)
   ctx.fillStyle = COLOR_FOREGROUND;
