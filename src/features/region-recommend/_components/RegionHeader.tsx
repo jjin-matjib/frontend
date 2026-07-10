@@ -7,7 +7,8 @@ interface Props {
 
 export function RegionHeader({ onBack }: Props) {
   return (
-    <header className="sticky top-0 z-(--z-sticky) flex items-center gap-1 bg-background/90 px-4 py-3 backdrop-blur">
+    // 반투명 + backdrop-blur는 스크롤 시 아래 콘텐츠가 비쳐 깨져 보여 불투명 배경 사용
+    <header className="sticky top-0 z-(--z-sticky) flex items-center gap-1 border-b border-border bg-background px-4 py-3">
       <Button variant="ghost" size="icon" onClick={onBack} aria-label="뒤로 가기">
         <ArrowLeft />
       </Button>
