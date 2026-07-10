@@ -3,7 +3,7 @@
 import { AdvancedMarker, APIProvider, Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import type { MapCluster, MapMarker } from '@/types/map';
+import type { MapCluster, MapMarker } from './types';
 import { MockMap } from './MockMap';
 
 interface Props {

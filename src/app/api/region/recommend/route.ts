@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { googlePlacesClient, googleRoutesClient } from "@/lib/api/google";
+import { getReferer, GOOGLE_API_KEY as API_KEY, googlePlacesClient, googleRoutesClient } from "@/lib/api/google";
+import { haversine } from "@/lib/geo";
 import {
   CANDIDATE_SEARCH_RADIUS_M,
   MAX_CANDIDATES,
@@ -14,7 +15,6 @@ import type {
   Restaurant,
 } from "@/features/region-recommend/types";
 import {
-  haversine,
   prefilterByHaversine,
   weightedCentroid,
 } from "@/features/region-recommend/utils/geo";
@@ -27,14 +27,6 @@ import {
   type ScorableZone,
 } from "@/features/region-recommend/utils/score";
 
-/**
- * 서버 전용 키를 우선 읽고, 팀 공용 변수명으로 폴백한다.
- * 키가 없으면 Mock으로 응답하므로 `.env.local`에 키만 꽂으면 실 API로 전환된다.
- */
-const API_KEY =
-  process.env.GOOGLE_MAPS_API_KEY ??
-  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ??
-  "";
 
 /** 역 검색은 평점이 필요 없다 → Pro SKU(월 5,000 무료). */
 const STATION_FIELD_MASK = [
@@ -58,15 +50,6 @@ interface Candidate {
   name: string;
   lat: number;
   lng: number;
-}
-
-function getReferer(req: NextRequest) {
-  const host =
-    req.headers.get("x-forwarded-host") ??
-    req.headers.get("host") ??
-    "localhost:3000";
-  const proto = req.headers.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}/`;
 }
 
 /** Places searchNearby 호출. fieldMask가 과금 SKU를 결정하므로 호출부에서 최소한으로 넘긴다. */

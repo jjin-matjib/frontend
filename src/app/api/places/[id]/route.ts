@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { googlePlacesClient } from "@/lib/api/google";
-
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+import { getReferer, GOOGLE_API_KEY as API_KEY, googlePlacesClient } from "@/lib/api/google";
+import { toPlaceDetail } from "@/features/place-detail/utils/googlePlaceDetail";
 
 const FIELD_MASK = [
   "id",
@@ -16,32 +15,6 @@ const FIELD_MASK = [
   "regularOpeningHours.weekdayDescriptions",
   "photos.name",
 ].join(",");
-
-function getReferer(req: NextRequest) {
-  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "localhost:3000";
-  const proto = req.headers.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}/`;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapPlaceDetail(p: any) {
-  return {
-    id: p.id ?? "",
-    name: p.displayName?.text ?? "",
-    category: p.primaryTypeDisplayName?.text ?? "기타",
-    isOpen: p.currentOpeningHours?.openNow ?? false,
-    weekdayHours: (p.regularOpeningHours?.weekdayDescriptions ?? []).map((line: string) =>
-      line.replace("요일", ""),
-    ),
-    phone: p.nationalPhoneNumber ?? "",
-    address: p.formattedAddress ?? "",
-    rating: p.rating ?? 0,
-    reviewCount: p.userRatingCount ?? 0,
-    lat: p.location?.latitude ?? 0,
-    lng: p.location?.longitude ?? 0,
-    photoName: p.photos?.[0]?.name ?? null,
-  };
-}
 
 export async function GET(
   req: NextRequest,
@@ -71,5 +44,5 @@ export async function GET(
     return NextResponse.json({ error: msg }, { status: res.status === 404 ? 404 : 502 });
   }
 
-  return NextResponse.json({ place: mapPlaceDetail(data) });
+  return NextResponse.json({ place: toPlaceDetail(data) });
 }

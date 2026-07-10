@@ -22,13 +22,23 @@ export function SearchHeader() {
     <div className="flex shrink-0 flex-col gap-3 px-4 py-3">
       <SearchBar onOpenFilter={() => setFilterOpen(true)} />
 
-      {hasActiveFilters ? (
-        <AppliedFilters onEditFilter={() => setFilterOpen(true)} />
-      ) : query ? null : (
-        <RecentSearches />
-      )}
+      <SearchHeaderContent
+        hasActiveFilters={hasActiveFilters}
+        query={query}
+        onEditFilter={() => setFilterOpen(true)}
+      />
 
       <FilterSheet open={filterOpen} onOpenChange={setFilterOpen} />
     </div>
   );
+}
+
+function SearchHeaderContent({ hasActiveFilters, query, onEditFilter }: {
+  hasActiveFilters: boolean;
+  query: string;
+  onEditFilter: () => void;
+}) {
+  if (hasActiveFilters) return <AppliedFilters onEditFilter={onEditFilter} />;
+  if (query) return null;
+  return <RecentSearches />;
 }

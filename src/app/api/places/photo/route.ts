@@ -1,16 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { googlePlacesClient } from "@/lib/api/google";
-
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
-
-function getReferer(req: NextRequest) {
-  const host =
-    req.headers.get("x-forwarded-host") ??
-    req.headers.get("host") ??
-    "localhost:3000";
-  const proto = req.headers.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}/`;
-}
+import { getReferer, GOOGLE_API_KEY as API_KEY, googlePlacesClient } from "@/lib/api/google";
 
 export async function GET(req: NextRequest) {
   const name = req.nextUrl.searchParams.get("name");

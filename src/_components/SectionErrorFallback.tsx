@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/_components/ui/button";
 
 interface Props {
   error: unknown;

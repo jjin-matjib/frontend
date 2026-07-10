@@ -5,12 +5,12 @@ import type { Place } from '../types';
 import { usePlaceSearch } from './usePlaceSearch';
 
 const PAGE_SIZE = 10;
-const MAX_API_RESULTS = 30;
+const MAX_API_RESULTS = 20; // Google searchText 페이지당 상한과 동일
 
-export function usePlaces(query: string | null) {
+export function usePlaces(query: string) {
   const [page, setPage] = useState(1);
   const [trackedQuery, setTrackedQuery] = useState(query);
-  const { places: apiPlaces, loading, error } = usePlaceSearch(query);
+  const apiPlaces = usePlaceSearch(query);
 
   if (query !== trackedQuery) {
     setTrackedQuery(query);
@@ -23,5 +23,5 @@ export function usePlaces(query: string | null) {
   const hasMore = places.length < allPlaces.length;
   const loadMore = useCallback(() => setPage((p) => p + 1), []);
 
-  return { places, allPlaces, hasMore, loadMore, loading, error };
+  return { places, allPlaces, hasMore, loadMore };
 }

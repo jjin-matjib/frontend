@@ -5,8 +5,15 @@ interface ApiErrorBody {
   message?: string;
 }
 
+// useSuspenseQuery는 SSR 중에도 queryFn을 실행하므로,
+// 서버에서는 상대 경로("/api")가 아닌 절대 URL이 필요하다.
+const baseURL =
+  typeof window === "undefined"
+    ? `http://localhost:${process.env.PORT ?? 3000}/api`
+    : "/api";
+
 export const apiClient = axios.create({
-  baseURL: "/api",
+  baseURL,
   timeout: 15_000,
 });
 

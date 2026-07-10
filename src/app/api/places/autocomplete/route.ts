@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { googlePlacesClient } from '@/lib/api/google';
-
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
-const SEOUL = { latitude: 37.5665, longitude: 126.978 };
-
-function getReferer(req: NextRequest) {
-  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host') ?? 'localhost:3000';
-  const proto = req.headers.get('x-forwarded-proto') ?? 'http';
-  return `${proto}://${host}/`;
-}
+import { getReferer, GOOGLE_API_KEY as API_KEY, googlePlacesClient, SEOUL_CENTER } from '@/lib/api/google';
+import { toSuggestions } from '@/features/search/utils/googleSuggestions';
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get('q');
@@ -19,7 +11,7 @@ export async function GET(req: NextRequest) {
     input: q,
     languageCode: 'ko',
     locationBias: {
-      circle: { center: SEOUL, radius: 20000 },
+      circle: { center: SEOUL_CENTER, radius: 20000 },
     },
   }, {
     headers: {
@@ -37,16 +29,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ suggestions: [] });
   }
 
-  const suggestions = (data.suggestions ?? [])
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .filter((s: any) => s.placePrediction)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .map((s: any) => ({
-      placeId: s.placePrediction.placeId ?? '',
-      text: s.placePrediction.text?.text ?? '',
-      mainText: s.placePrediction.structuredFormat?.mainText?.text ?? '',
-      secondaryText: s.placePrediction.structuredFormat?.secondaryText?.text ?? '',
-    }));
-
-  return NextResponse.json({ suggestions });
+  return NextResponse.json({ suggestions: toSuggestions(data.suggestions ?? []) });
 }

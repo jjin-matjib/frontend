@@ -1,4 +1,4 @@
-import type { MapMarker } from '@/types/map';
+import type { MapMarker } from '@/_components/map';
 import { MAP_CENTER } from '../constants/map';
 import type { Place } from '../types';
 

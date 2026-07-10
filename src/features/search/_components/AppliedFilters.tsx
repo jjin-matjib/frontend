@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/_components/ui/button";
 import { useSearchFilters } from "../hooks/useSearchFilters";
 import { RemovableChip } from "./RemovableChip";
 

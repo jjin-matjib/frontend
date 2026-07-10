@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/_components/ui/button";
 import { MAX_PARTICIPANTS, MIN_PARTICIPANTS } from "../constants/config";
 import {
   recommendFormSchema,

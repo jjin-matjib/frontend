@@ -1,5 +1,5 @@
-import { GoogleMapWrapper } from '@/components/map';
-import type { MapMarker } from '@/types/map';
+import { GoogleMapWrapper } from '@/_components/map';
+import type { MapMarker } from '@/_components/map';
 import { MAP_DEFAULT_ZOOM } from '../constants/map';
 import { calcCenter } from '../utils/map';
 

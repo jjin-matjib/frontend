@@ -1,5 +1,5 @@
 import { Image as ImageIcon, Link2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/_components/ui/button";
 import type { ShareResult } from "../hooks/usePlaceShare";
 
 const RESULT_MESSAGE: Partial<Record<ShareResult, string>> = {

@@ -5,8 +5,10 @@ interface MapLinkPlace {
   lng: number;
 }
 
-export function getKakaoMapUrl({ lat, lng }: MapLinkPlace) {
-  return `kakaomap://look?p=${lat},${lng}`;
+export function getKakaoMapUrl({ name, lat, lng }: MapLinkPlace) {
+  // 웹에서도 열리는 공식 바로가기 URL — 모바일이면 앱 연결까지 처리해준다.
+  // (kakaomap:// 스킴은 앱이 없는 환경에서 아무 동작도 하지 않는다)
+  return `https://map.kakao.com/link/map/${encodeURIComponent(name)},${lat},${lng}`;
 }
 
 export function getNaverMapUrl({ name }: MapLinkPlace) {

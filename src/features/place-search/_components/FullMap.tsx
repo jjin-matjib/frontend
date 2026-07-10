@@ -1,9 +1,10 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
-import { GoogleMapWrapper } from '@/components/map';
-import type { MapMarker } from '@/types/map';
+import { GoogleMapWrapper } from '@/_components/map';
+import type { MapMarker } from '@/_components/map';
 import { MAP_DEFAULT_ZOOM } from '../constants/map';
 import type { Place } from '../types';
 import { calcCenter } from '../utils/map';
@@ -17,14 +18,21 @@ function MarkerInfoCard({ place, onClose }: { place: Place; onClose: () => void 
   return (
     <div className="absolute bottom-3 left-3 right-3 z-10 bg-place-surface rounded-xl shadow-lg border border-border p-4">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
+        {/* 리스트 카드와 동일하게 상세 페이지로 이동한다 */}
+        <Link
+          href={`/places/${encodeURIComponent(place.id)}`}
+          className="flex-1 min-w-0"
+        >
           <div className="flex items-center gap-1.5 mb-0.5">
             <span className="text-xs text-muted-foreground">{place.category}</span>
             <span className={`text-xs font-medium ${place.isOpen ? 'text-place-open' : 'text-destructive'}`}>
               {place.isOpen ? '영업 중' : '영업 종료'}
             </span>
           </div>
-          <p className="font-semibold text-foreground text-sm truncate">{place.name}</p>
+          <div className="flex items-center gap-1">
+            <p className="font-semibold text-foreground text-sm truncate">{place.name}</p>
+            <ChevronRight className="w-4 h-4 shrink-0 text-muted-foreground" />
+          </div>
           <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
             <span>★ {place.rating.toFixed(1)}</span>
             <span>({place.reviewCount.toLocaleString()})</span>
@@ -39,7 +47,7 @@ function MarkerInfoCard({ place, onClose }: { place: Place; onClose: () => void 
               ))}
             </div>
           )}
-        </div>
+        </Link>
         <button
           type="button"
           onClick={onClose}

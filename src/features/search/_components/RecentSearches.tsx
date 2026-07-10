@@ -1,7 +1,7 @@
 "use client";
 
 import { MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/_components/ui/button";
 import { useRecentSearches } from "../hooks/useRecentSearches";
 import { useSearchQuery } from "../hooks/useSearchQuery";
 import { RemovableChip } from "./RemovableChip";
