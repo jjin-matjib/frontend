@@ -20,6 +20,10 @@ jobs:
         with:
           node-version: 20
 
+      # vercel build가 pnpm-lock.yaml을 감지해 pnpm을 실행하므로 corepack으로 활성화
+      - name: Enable pnpm via corepack
+        run: corepack enable
+
       - name: Pull Vercel environment
         run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
