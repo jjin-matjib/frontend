@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { Clock, MapPin, Phone, Star } from "lucide-react";
-import Image from "next/image";
 import type { PlaceDetail } from "../types";
 import { getTodayHours } from "../utils/openingHours";
 
@@ -27,14 +26,14 @@ export function PlaceInfoSection({ place }: Props) {
         </div>
       </div>
 
-      <dl className="flex gap-4 rounded-xl border p-4 text-sm leading-5">
-        <div className="flex flex-[4] flex-col gap-4">
+      <dl className="rounded-xl border p-4 text-sm leading-5">
+        <div className="flex flex-col gap-4">
           <div className="flex gap-3">
             <dt className="shrink-0">
               <Clock className="mt-0.5 size-4 text-muted-foreground" />
               <span className="sr-only">영업시간</span>
             </dt>
-            <dd className="flex flex-col gap-1 whitespace-nowrap">
+            <dd className="flex min-w-0 flex-col gap-1">
               <span
                 className={cn(
                   "font-medium",
@@ -85,19 +84,6 @@ export function PlaceInfoSection({ place }: Props) {
             </div>
           )}
         </div>
-
-        {place.photoName && (
-          <div className="relative h-28 flex-[3] self-start overflow-hidden rounded-lg">
-            <Image
-              src={`/api/places/photo?name=${encodeURIComponent(place.photoName)}&maxWidthPx=300`}
-              alt={place.name}
-              fill
-              sizes="(max-width: 375px) 35vw, 140px"
-              unoptimized
-              className="object-cover"
-            />
-          </div>
-        )}
       </dl>
     </section>
   );
