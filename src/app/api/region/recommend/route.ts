@@ -40,6 +40,14 @@ const PLACES_NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby"
 const ROUTE_MATRIX_URL =
   "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix";
 
+/**
+ * 후보 권역으로 쓸 역 타입.
+ * Places API(New)의 `includedTypes`는 Table A 타입만 허용한다.
+ * `subway_station`은 Table B(응답 전용)라 필터로 넣으면 400이 난다.
+ * 한국 지하철역은 Google에서 train_station / transit_station 으로도 분류되므로 이 둘을 쓴다.
+ */
+const STATION_INCLUDED_TYPES = ["train_station", "transit_station"];
+
 /** 역 검색은 평점이 필요 없다 → Pro SKU(월 5,000 무료). */
 const STATION_FIELD_MASK = [
   "places.id",
@@ -73,11 +81,14 @@ function getReferer(req: NextRequest) {
   return `${proto}://${host}/`;
 }
 
-/** Places searchNearby 호출. fieldMask가 과금 SKU를 결정하므로 호출부에서 최소한으로 넘긴다. */
+/**
+ * Places searchNearby 호출. fieldMask가 과금 SKU를 결정하므로 호출부에서 최소한으로 넘긴다.
+ * includedTypes에는 **Table A 타입만** 넣을 수 있다(Table B를 넣으면 400).
+ */
 async function searchNearby(
   req: NextRequest,
   center: { lat: number; lng: number },
-  includedType: string,
+  includedTypes: string[],
   radius: number,
   maxResultCount: number,
   rankPreference: "DISTANCE" | "POPULARITY",
@@ -92,7 +103,7 @@ async function searchNearby(
       "X-Goog-FieldMask": fieldMask,
     },
     body: JSON.stringify({
-      includedTypes: [includedType],
+      includedTypes,
       maxResultCount,
       rankPreference,
       languageCode: "ko",
@@ -168,7 +179,7 @@ async function fetchRestaurants(
     const places = await searchNearby(
       req,
       zone,
-      "restaurant",
+      ["restaurant"],
       RESTAURANT_SEARCH_RADIUS_M,
       RESTAURANT_SAMPLE_SIZE,
       "POPULARITY",
@@ -218,11 +229,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // 1. 후보 권역 발굴: 중심점 주변 지하철역 (Pro SKU, 1콜)
+    // 1. 후보 권역 발굴: 중심점 주변 역 (Pro SKU, 1콜)
+    //    `subway_station`은 Table B라 includedTypes에 넣을 수 없다(400).
+    //    Table A인 train_station·transit_station으로 지하철역을 포함해 조회한다.
     const nearby = await searchNearby(
       req,
       center,
-      "subway_station",
+      STATION_INCLUDED_TYPES,
       CANDIDATE_SEARCH_RADIUS_M,
       MAX_CANDIDATES,
       "DISTANCE",
