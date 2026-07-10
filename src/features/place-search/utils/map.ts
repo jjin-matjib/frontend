@@ -1,5 +1,5 @@
 import type { MapMarker } from '@/types/map';
-import { MAP_CENTER } from '../constants/dummy-markers';
+import { MAP_CENTER } from '../constants/map';
 import type { Place } from '../types';
 
 export function calcCenter(markers: MapMarker[]) {

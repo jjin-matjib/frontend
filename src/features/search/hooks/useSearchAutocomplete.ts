@@ -1,29 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-export interface SearchSuggestion {
-  placeId: string;
-  text: string;
-  mainText: string;
-  secondaryText: string;
-}
+import { useQuery } from "@tanstack/react-query";
+import { getPlaceSuggestions } from "../api/getPlaceSuggestions";
+import { searchKeys } from "../constants/queryKeys";
 
 export function useSearchAutocomplete(input: string, disabled = false) {
-  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [debouncedInput, setDebouncedInput] = useState(input);
 
   useEffect(() => {
-    if (disabled || input.length < 2) return;
-
-    const timer = setTimeout(() => {
-      fetch(`/api/places/autocomplete?q=${encodeURIComponent(input)}`)
-        .then((response) => response.json())
-        .then((data) => setSuggestions(data.suggestions ?? []))
-        .catch(() => setSuggestions([]));
-    }, 300);
+    const timer = setTimeout(() => setDebouncedInput(input), 300);
 
     return () => clearTimeout(timer);
-  }, [disabled, input]);
+  }, [input]);
 
-  return disabled || input.length < 2 ? [] : suggestions;
+  const enabled = !disabled && debouncedInput.length >= 2;
+  const { data } = useQuery({
+    queryKey: searchKeys.autocomplete(debouncedInput),
+    queryFn: () => getPlaceSuggestions(debouncedInput),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return enabled ? (data ?? []) : [];
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { googlePlacesClient } from '@/lib/api/google';
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 const SEOUL = { latitude: 37.5665, longitude: 126.978 };
@@ -93,8 +94,14 @@ export async function GET(req: NextRequest) {
   if (!q) return NextResponse.json({ places: [] });
   if (!API_KEY) return NextResponse.json({ error: 'API key missing' }, { status: 500 });
 
-  const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
-    method: 'POST',
+  const res = await googlePlacesClient.post('/places:searchText', {
+    textQuery: q,
+    languageCode: 'ko',
+    locationBias: {
+      circle: { center: SEOUL, radius: 20000 },
+    },
+    pageSize: 30,
+  }, {
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': API_KEY,
@@ -111,20 +118,13 @@ export async function GET(req: NextRequest) {
         'places.location',
       ].join(','),
     },
-    body: JSON.stringify({
-      textQuery: q,
-      languageCode: 'ko',
-      locationBias: {
-        circle: { center: SEOUL, radius: 20000 },
-      },
-      pageSize: 30,
-    }),
+    validateStatus: () => true,
   });
 
-  const data = await res.json();
+  const data = res.data;
 
-  if (!res.ok) {
-    const msg = data?.error?.message ?? res.statusText;
+  if (res.status < 200 || res.status >= 300) {
+    const msg = data?.error?.message ?? `Google Places error (${res.status})`;
     console.error('[places/search] API error:', msg);
     return NextResponse.json({ error: msg, places: [] }, { status: 502 });
   }

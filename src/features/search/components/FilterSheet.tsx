@@ -27,6 +27,17 @@ type FilterSheetProps = {
   onOpenChange: (open: boolean) => void;
 };
 
+const FILTER_GROUPS = [
+  { group: "category", title: "카테고리", options: CATEGORY_OPTIONS },
+  { group: "distance", title: "거리", options: DISTANCE_OPTIONS },
+  { group: "open", title: "영업 여부", options: OPEN_STATUS_OPTIONS },
+  { group: "sort", title: "정렬", options: SORT_OPTIONS },
+] satisfies readonly {
+  group: FilterGroup;
+  title: string;
+  options: readonly FilterOption<string>[];
+}[];
+
 /**
  * 카테고리 · 거리 · 영업 여부 · 정렬을 선택하는 필터 바텀시트.
  * 선택은 draft(로컬)에 담아 두고 "적용하기"를 눌러야 URL 필터에 반영된다.
@@ -42,11 +53,11 @@ export function FilterSheet({ open, onOpenChange }: FilterSheetProps) {
     if (open) setDraft(filters);
   }
 
-  const toggle = <G extends FilterGroup>(group: G, value: SearchFilters[G]) => {
+  const toggle = (group: FilterGroup, value: string) => {
     setDraft((prev) => ({
       ...prev,
       [group]: prev[group] === value ? null : value,
-    }));
+    }) as SearchFilters);
   };
 
   const handleApply = () => {
@@ -69,30 +80,15 @@ export function FilterSheet({ open, onOpenChange }: FilterSheetProps) {
             </div>
 
             <div className="flex flex-col gap-6 overflow-y-auto px-5 pb-4">
-              <OptionGroup
-                title="카테고리"
-                options={CATEGORY_OPTIONS}
-                selected={draft.category}
-                onToggle={(value) => toggle("category", value)}
-              />
-              <OptionGroup
-                title="거리"
-                options={DISTANCE_OPTIONS}
-                selected={draft.distance}
-                onToggle={(value) => toggle("distance", value)}
-              />
-              <OptionGroup
-                title="영업 여부"
-                options={OPEN_STATUS_OPTIONS}
-                selected={draft.open}
-                onToggle={(value) => toggle("open", value)}
-              />
-              <OptionGroup
-                title="정렬"
-                options={SORT_OPTIONS}
-                selected={draft.sort}
-                onToggle={(value) => toggle("sort", value)}
-              />
+              {FILTER_GROUPS.map(({ group, title, options }) => (
+                <OptionGroup
+                  key={group}
+                  title={title}
+                  options={options}
+                  selected={draft[group]}
+                  onToggle={(value) => toggle(group, value)}
+                />
+              ))}
             </div>
 
             <div className="flex gap-2 border-t border-border px-5 py-3">
@@ -115,19 +111,19 @@ export function FilterSheet({ open, onOpenChange }: FilterSheetProps) {
   );
 }
 
-type OptionGroupProps<T extends string> = {
+type OptionGroupProps = {
   title: string;
-  options: readonly FilterOption<T>[];
-  selected: T | null;
-  onToggle: (value: T) => void;
+  options: readonly FilterOption<string>[];
+  selected: string | null;
+  onToggle: (value: string) => void;
 };
 
-function OptionGroup<T extends string>({
+function OptionGroup({
   title,
   options,
   selected,
   onToggle,
-}: OptionGroupProps<T>) {
+}: OptionGroupProps) {
   return (
     <fieldset className="flex flex-col gap-2.5">
       <legend className="mb-2.5 text-sm font-medium text-muted-foreground">

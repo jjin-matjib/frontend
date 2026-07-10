@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { googlePlacesClient, googleRoutesClient } from "@/lib/api/google";
 import {
   CANDIDATE_SEARCH_RADIUS_M,
   MAX_CANDIDATES,
@@ -17,7 +18,6 @@ import {
   prefilterByHaversine,
   weightedCentroid,
 } from "@/features/region-recommend/utils/geo";
-import { buildMockResult } from "@/features/region-recommend/utils/mockRecommend";
 import {
   excludeUnrated,
   sortByBayesian,
@@ -35,10 +35,6 @@ const API_KEY =
   process.env.GOOGLE_MAPS_API_KEY ??
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ??
   "";
-
-const PLACES_NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby";
-const ROUTE_MATRIX_URL =
-  "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix";
 
 /** 역 검색은 평점이 필요 없다 → Pro SKU(월 5,000 무료). */
 const STATION_FIELD_MASK = [
@@ -83,30 +79,29 @@ async function searchNearby(
   rankPreference: "DISTANCE" | "POPULARITY",
   fieldMask: string,
 ) {
-  const res = await fetch(PLACES_NEARBY_URL, {
-    method: "POST",
+  const res = await googlePlacesClient.post("/places:searchNearby", {
+    includedTypes: [includedType],
+    maxResultCount,
+    rankPreference,
+    languageCode: "ko",
+    locationRestriction: {
+      circle: {
+        center: { latitude: center.lat, longitude: center.lng },
+        radius,
+      },
+    },
+  }, {
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": API_KEY,
       Referer: getReferer(req),
       "X-Goog-FieldMask": fieldMask,
     },
-    body: JSON.stringify({
-      includedTypes: [includedType],
-      maxResultCount,
-      rankPreference,
-      languageCode: "ko",
-      locationRestriction: {
-        circle: {
-          center: { latitude: center.lat, longitude: center.lng },
-          radius,
-        },
-      },
-    }),
+    validateStatus: () => true,
   });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data?.error?.message ?? res.statusText);
+  const data = res.data;
+  if (res.status < 200 || res.status >= 300) {
+    throw new Error(data?.error?.message ?? `Google Places error (${res.status})`);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data.places ?? []) as any[];
@@ -118,31 +113,30 @@ async function computeTransitMinutes(
   origins: RecommendOrigin[],
   destinations: Candidate[],
 ): Promise<number[][]> {
-  const res = await fetch(ROUTE_MATRIX_URL, {
-    method: "POST",
+  const res = await googleRoutesClient.post("/distanceMatrix/v2:computeRouteMatrix", {
+    origins: origins.map((o) => ({
+      waypoint: {
+        location: { latLng: { latitude: o.lat, longitude: o.lng } },
+      },
+    })),
+    destinations: destinations.map((d) => ({
+      waypoint: {
+        location: { latLng: { latitude: d.lat, longitude: d.lng } },
+      },
+    })),
+    travelMode: "TRANSIT",
+  }, {
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": API_KEY,
       Referer: getReferer(req),
       "X-Goog-FieldMask": "originIndex,destinationIndex,duration,condition",
     },
-    body: JSON.stringify({
-      origins: origins.map((o) => ({
-        waypoint: {
-          location: { latLng: { latitude: o.lat, longitude: o.lng } },
-        },
-      })),
-      destinations: destinations.map((d) => ({
-        waypoint: {
-          location: { latLng: { latitude: d.lat, longitude: d.lng } },
-        },
-      })),
-      travelMode: "TRANSIT",
-    }),
+    validateStatus: () => true,
   });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data?.error?.message ?? res.statusText);
+  const data = res.data;
+  if (res.status < 200 || res.status >= 300) {
+    throw new Error(data?.error?.message ?? `Google Routes error (${res.status})`);
   }
 
   const matrix: number[][] = origins.map(() =>
@@ -214,7 +208,10 @@ export async function POST(req: NextRequest) {
 
   // 키가 없으면 더미로 응답한다. 키를 꽂으면 코드 수정 없이 실 API로 전환된다.
   if (!API_KEY) {
-    return NextResponse.json({ result: buildMockResult(input), mock: true });
+    return NextResponse.json(
+      { error: "Google Maps API key is missing" },
+      { status: 500 },
+    );
   }
 
   try {
@@ -278,7 +275,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       result: { recommended: ranked[0], candidates: ranked, restaurants },
-      mock: false,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "추천에 실패했습니다.";

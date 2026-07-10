@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { googlePlacesClient } from '@/lib/api/google';
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 const SEOUL = { latitude: 37.5665, longitude: 126.978 };
@@ -14,26 +15,25 @@ export async function GET(req: NextRequest) {
   if (!q || q.length < 2) return NextResponse.json({ suggestions: [] });
   if (!API_KEY) return NextResponse.json({ error: 'API key missing' }, { status: 500 });
 
-  const res = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
-    method: 'POST',
+  const res = await googlePlacesClient.post('/places:autocomplete', {
+    input: q,
+    languageCode: 'ko',
+    locationBias: {
+      circle: { center: SEOUL, radius: 20000 },
+    },
+  }, {
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': API_KEY,
       'Referer': getReferer(req),
     },
-    body: JSON.stringify({
-      input: q,
-      languageCode: 'ko',
-      locationBias: {
-        circle: { center: SEOUL, radius: 20000 },
-      },
-    }),
+    validateStatus: () => true,
   });
 
-  const data = await res.json();
+  const data = res.data;
 
-  if (!res.ok) {
-    console.error('[places/autocomplete] API error:', data?.error?.message ?? res.statusText);
+  if (res.status < 200 || res.status >= 300) {
+    console.error('[places/autocomplete] API error:', data?.error?.message ?? res.status);
     return NextResponse.json({ suggestions: [] });
   }
 

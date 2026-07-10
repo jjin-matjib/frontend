@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react';
 import { Clock } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { FooterNav } from '@/components/FooterNav';
-import { SearchHeader } from '@/features/search';
 import { FullMap } from './components/FullMap';
 import { MapPreview } from './components/MapPreview';
 import { PlaceList } from './components/PlaceList';
@@ -14,7 +13,11 @@ import { usePlaces } from './hooks/usePlaces';
 import { useViewTab } from './hooks/useViewTab';
 import { toMarkers } from './utils/map';
 
-export function PlaceSearchPage() {
+interface Props {
+  searchHeader: React.ReactNode;
+}
+
+export function PlaceSearchPage({ searchHeader }: Props) {
   const [tab, setTab] = useViewTab();
   const [query] = useQueryState('q');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -47,7 +50,7 @@ export function PlaceSearchPage() {
         <p className="text-xl font-bold text-place-header">먹지도</p>
       </div>
 
-      <SearchHeader />
+      {searchHeader}
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {hasResults ? (

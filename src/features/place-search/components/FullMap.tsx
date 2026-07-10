@@ -4,12 +4,12 @@ import { X } from 'lucide-react';
 import { useState } from 'react';
 import { GoogleMapWrapper } from '@/components/map';
 import type { MapMarker } from '@/types/map';
-import { DUMMY_CLUSTERS, DUMMY_MARKERS, MAP_DEFAULT_ZOOM } from '../constants/dummy-markers';
+import { MAP_DEFAULT_ZOOM } from '../constants/map';
 import type { Place } from '../types';
 import { calcCenter } from '../utils/map';
 
 interface Props {
-  markers?: MapMarker[];
+  markers: MapMarker[];
   places?: Place[];
 }
 
@@ -54,9 +54,7 @@ function MarkerInfoCard({ place, onClose }: { place: Place; onClose: () => void 
 
 export function FullMap({ markers, places }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const pins = markers ?? DUMMY_MARKERS;
-  const clusters = markers ? [] : DUMMY_CLUSTERS;
-  const center = calcCenter(pins);
+  const center = calcCenter(markers);
 
   const selectedPlace = selectedId && places ? (places.find((p) => p.id === selectedId) ?? null) : null;
 
@@ -70,8 +68,8 @@ export function FullMap({ markers, places }: Props) {
         key={`${center.lat.toFixed(4)},${center.lng.toFixed(4)}`}
         center={center}
         zoom={MAP_DEFAULT_ZOOM}
-        markers={pins}
-        clusters={clusters}
+        markers={markers}
+        clusters={[]}
         onMarkerClick={places ? handleMarkerClick : undefined}
         selectedMarkerId={selectedId ?? undefined}
         className="w-full h-full rounded-xl border border-border"

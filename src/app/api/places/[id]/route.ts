@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { googlePlacesClient } from "@/lib/api/google";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 
@@ -49,21 +50,23 @@ export async function GET(
   const { id } = await params;
   if (!API_KEY) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
-  const res = await fetch(
-    `https://places.googleapis.com/v1/places/${encodeURIComponent(id)}?languageCode=ko`,
+  const res = await googlePlacesClient.get(
+    `/places/${encodeURIComponent(id)}`,
     {
+      params: { languageCode: "ko" },
       headers: {
         "X-Goog-Api-Key": API_KEY,
         "Referer": getReferer(req),
         "X-Goog-FieldMask": FIELD_MASK,
       },
+      validateStatus: () => true,
     },
   );
 
-  const data = await res.json();
+  const data = res.data;
 
-  if (!res.ok) {
-    const msg = data?.error?.message ?? res.statusText;
+  if (res.status < 200 || res.status >= 300) {
+    const msg = data?.error?.message ?? `Google Places error (${res.status})`;
     console.error("[places/detail] API error:", msg);
     return NextResponse.json({ error: msg }, { status: res.status === 404 ? 404 : 502 });
   }
