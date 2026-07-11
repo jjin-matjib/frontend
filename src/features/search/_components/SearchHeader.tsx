@@ -19,7 +19,7 @@ export function SearchHeader() {
   const { hasActiveFilters } = useSearchFilters();
 
   return (
-    <div className="flex shrink-0 flex-col gap-3 px-4 py-3">
+    <div className="flex shrink-0 flex-col gap-3 px-4 pt-0 pb-3">
       <SearchBar onOpenFilter={() => setFilterOpen(true)} />
 
       <SearchHeaderContent

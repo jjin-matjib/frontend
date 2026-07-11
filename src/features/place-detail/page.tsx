@@ -14,7 +14,7 @@ export function PlaceDetailPage({ placeId }: Props) {
   const router = useRouter();
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 pb-10">
+    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-2 pb-10">
       <PlaceDetailHeader onBack={() => router.back()} />
       <Suspense fallback={<PlaceDetailSkeleton />}>
         <PlaceDetailContent placeId={placeId} />
