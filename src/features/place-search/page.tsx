@@ -4,7 +4,6 @@ import { Clock } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FooterNav } from '@/_components/FooterNav';
-import mukjidoLogo from '@/app/icon.png';
 import { useSearchQuery } from '@/features/search';
 import { PlaceSearchContent } from './_components/PlaceSearchContent';
 import { useViewTab } from './hooks/useViewTab';
@@ -21,14 +20,14 @@ export function PlaceSearchPage({ searchHeader }: Props) {
   return (
     <main className="relative flex flex-col h-dvh bg-place-bg w-full">
       {/* 헤더 placeholder — 별도 담당자 구현 예정 */}
-      <div className="shrink-0 h-[74px] px-4 flex items-center gap-3">
+      <div className="flex h-16 shrink-0 items-center px-4">
         <Image
-          src={mukjidoLogo}
+          src="/assets/mukjido-logo.png"
           alt="먹지도"
-          width={66}
-          height={66}
+          width={148}
+          height={52}
           priority
-          className="size-[66px] rounded-full object-cover"
+          className="h-[52px] w-[148px] object-contain object-left"
         />
       </div>
 

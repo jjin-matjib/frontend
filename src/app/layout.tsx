@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Providers } from "@/providers";
 import "./globals.css";
@@ -13,6 +13,22 @@ const pretendard = localFont({
 export const metadata: Metadata = {
   title: "먹지도",
   description: "먹지도 — 맛집 검색과 만남 권역 추천",
+  applicationName: "먹지도",
+  appleWebApp: {
+    capable: true,
+    title: "먹지도",
+    statusBarStyle: "default",
+  },
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#faf8f5",
 };
 
 export default function RootLayout({
